@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environmental Health Course Overview</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            color: #34495e;
+        }
+        h2 {
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 30px;
+            font-size: 2rem;
+            color: #2c3e50;
+        }
+        h3 {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            color: #34495e;
+        }
+        p {
+            margin: 10px 0;
+            font-size: 1.1rem;
+            color: #555;
+        }
+        ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        ul li {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            color: #555;
+        }
+        .section {
+            margin-bottom: 30px;
+            display: none; /* Hide all sections by default */
+        }
+        .section.active {
+            display: block; /* Show the active section */
+        }
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .pagination button {
+            padding: 12px 24px;
+            margin: 0 10px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        .pagination button:hover {
+            background-color: #2980b9;
+        }
+        .pagination button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        .header-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Image -->
+        <img src="https://images.unsplash.com/photo-1719825523711-eda3221c111c?w=700&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8ZW52aXJvbm1lbnRhbGhlYWx0aHxlbnwwfHwwfHx8MA%3D%3D" 
+             alt="Environmental Health Header Image" 
+             class="header-image">
+
+        <!-- Sections -->
+        <div id="section1" class="section active">
+            <h2>Introduction to Environmental Health</h2>
+            <p>Environmental health is a branch of public health that focuses on how natural and built environments affect human health. It involves identifying and addressing environmental factors that can harm health, such as air and water pollution, hazardous waste, and climate change.</p>
+        </div>
+
+        <div id="section2" class="section">
+            <h2>Key Concepts in Environmental Health</h2>
+            <ul>
+                <li><strong>Air Quality</strong>: Monitoring and improving air quality to reduce respiratory and cardiovascular diseases.</li>
+                <li><strong>Water Quality</strong>: Ensuring access to clean and safe drinking water.</li>
+                <li><strong>Waste Management</strong>: Proper disposal and recycling of waste to prevent contamination.</li>
+                <li><strong>Climate Change</strong>: Addressing the health impacts of climate change, such as extreme weather and vector-borne diseases.</li>
+                <li><strong>Environmental Justice</strong>: Ensuring equitable access to a healthy environment for all communities.</li>
+            </ul>
+        </div>
+
+        <div id="section3" class="section">
+            <h2>Core Subjects in Environmental Health</h2>
+            <ul>
+                <li><strong>Environmental Toxicology</strong>: Study of the effects of chemicals on human health and ecosystems.</li>
+                <li><strong>Epidemiology</strong>: Investigating patterns and causes of diseases related to environmental factors.</li>
+                <li><strong>Environmental Policy</strong>: Developing and implementing policies to protect public health and the environment.</li>
+                <li><strong>Risk Assessment</strong>: Evaluating the risks posed by environmental hazards.</li>
+                <li><strong>Sustainability</strong>: Promoting sustainable practices to protect natural resources.</li>
+            </ul>
+        </div>
+
+        <div id="section4" class="section">
+            <h2>Career Opportunities in Environmental Health</h2>
+            <ul>
+                <li><strong>Environmental Health Specialist</strong>: Monitoring and addressing environmental health risks.</li>
+                <li><strong>Public Health Advisor</strong>: Advising on policies to improve environmental health.</li>
+                <li><strong>Environmental Scientist</strong>: Conducting research on environmental issues.</li>
+                <li><strong>Policy Analyst</strong>: Developing and analyzing environmental policies.</li>
+                <li><strong>Sustainability Consultant</strong>: Helping organizations adopt sustainable practices.</li>
+            </ul>
+        </div>
+
+        <div id="section5" class="section">
+            <h2>Importance of Environmental Health</h2>
+            <p>Environmental health is critical for protecting human health and ensuring the sustainability of natural resources. By addressing environmental risks, we can prevent diseases, improve quality of life, and create a healthier planet for future generations.</p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            <button id="prevBtn">Previous</button>
+            <button id="nextBtn">Next</button>
+        </div>
+    </div>
+
+    <script>
+        // Pagination Logic
+        const sections = document.querySelectorAll('.section');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        let currentSection = 0;
+
+        function showSection(index) {
+            sections.forEach((section, i) => {
+                section.classList.toggle('active', i === index);
+            });
+        }
+
+        function updateButtons() {
+            prevBtn.disabled = currentSection === 0;
+            nextBtn.disabled = currentSection === sections.length - 1;
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Smooth scroll to the top
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentSection > 0) {
+                currentSection--;
+                showSection(currentSection);
+                updateButtons();
+                scrollToTop(); // Scroll to the top
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSection < sections.length - 1) {
+                currentSection++;
+                showSection(currentSection);
+                updateButtons();
+                scrollToTop(); // Scroll to the top
+            }
+        });
+
+        // Initialize
+        showSection(currentSection);
+        updateButtons();
+    </script>
+</body>
+</html>
