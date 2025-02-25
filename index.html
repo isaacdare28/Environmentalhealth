@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environmental Health Students App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #2c3e50;
+            background: url('https://images.unsplash.com/photo-1719825523711-eda3221c111c?w=700&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8ZW52aXJvbm1lbnRhbGhlYWx0aHxlbnwwfHwwfHx8MA%3D%3D');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            line-height: 1.6;
+        }
+
+        header {
+            background: rgba(34, 49, 63, 0.9); /* Darker semi-transparent header */
+            padding: 2rem 1rem;
+            text-align: center;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .title-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            color: #27ae60; /* Green color for the title */
+        }
+
+        .title:hover {
+            letter-spacing: 2px;
+            color: #2ecc71; /* Lighter green on hover */
+        }
+
+        .notification-icon {
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            background-color: #e74c3c;
+            transition: transform 0.3s ease;
+        }
+
+        .notification-icon img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .notification-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+            color: #ecf0f1;
+            font-style: italic;
+        }
+
+        .menu-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 40px 10%;
+            padding: 0;
+        }
+
+        .menu-item {
+            background: rgba(255, 255, 255, 0.95); /* Semi-transparent white */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .menu-item img {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-item:hover img {
+            transform: rotate(10deg);
+        }
+
+        .menu-item h2 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2980b9; /* Blue color for headings */
+        }
+
+        .menu-item a {
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .submenu {
+            display: none;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover .submenu {
+            display: block;
+        }
+
+        .submenu a {
+            display: block;
+            padding: 5px 0;
+            color: #27ae60; /* Green color for submenu links */
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .submenu a:hover {
+            padding-left: 10px;
+            color: #e74c3c; /* Red color on hover */
+        }
+
+        .section {
+            display: none;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.98); /* Semi-transparent white */
+            border-radius: 12px;
+            margin: 20px auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 900px;
+        }
+
+        .section h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .section p {
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            color: #7f8c8d;
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+
+            .menu-container {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                margin: 20px 5%;
+            }
+
+            .menu-item h2 {
+                font-size: 1.2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .title {
+                font-size: 1.8rem;
+            }
+
+            .menu-container {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+
+            .menu-item h2 {
+                font-size: 1rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .notification-icon img {
+                width: 25px;
+                height: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="title-container">
+            <h1 class="title">Environmental Health</h1>
+            <a href="javascript:void(0)" class="notification-icon" onclick="handleNotifications()">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="Notifications">
+            </a>
+        </div>
+        <h2 class="subtitle">Empowering Future Environmental Health Professionals</h2>
+    </header>
+
+    <div class="menu-container">
+        <div class="menu-item">
+            <a href="overview.html">
+                <img src="https://img.icons8.com/ios/50/2980b9/overview-pages-3.png" alt="Course Overview">
+                <h2>Course Overview</h2>
+            </a>
+        </div>
+        <div class="menu-item">
+            <img src="https://img.icons8.com/ios/50/2980b9/book.png" alt="Learning Modules">
+            <h2>Learning Modules</h2>
+            <div class="submenu">
+                <a href="javascript:void(0)" onclick="handleLink('S133')">Lecture Slides</a>
+                <a href="javascript:void(0)" onclick="handleLink('S125')">Flashcards</a>
+                <a href="javascript:void(0)" onclick="handleLink('S130')">Videos</a>
+                <a href="javascript:void(0)" onclick="handleLink('S124')">Quizzes</a>
+            </div>
+        </div>
+        <div class="menu-item">
+            <img src="https://img.icons8.com/ios/50/2980b9/administrative-tools.png" alt="Environmental Tools">
+            <h2>Environmental Tools</h2>
+            <div class="submenu">
+                <a href="javascript:void(0)" onclick="handleLink('S127')">Pollution Monitoring</a>
+                <a href="javascript:void(0)" onclick="handleLink('S132')">Case Studies</a>
+                <a href="javascript:void(0)" onclick="handleLink('S126')">Waste Management</a>
+            </div>
+        </div>
+        <div class="menu-item">
+            <img src="https://img.icons8.com/ios/50/2980b9/conference.png" alt="Community">
+            <h2>Community</h2>
+            <div class="submenu">
+                <a href="javascript:void(0)" onclick="handleLink('S128')">Forum</a>
+                <a href="javascript:void(0)" onclick="handleLink('S131')">Chats</a>
+            </div>
+        </div>
+        <div class="menu-item">
+            <img src="https://img.icons8.com/ios/50/2980b9/class.png" alt="Courses">
+            <h2>Courses</h2>
+            <div class="submenu">
+                <a href="javascript:void(0)" onclick="handleLink('S129')">Enroll Now</a>
+            </div>
+        </div>
+        <div class="menu-item">
+            <img src="https://img.icons8.com/ios/50/2980b9/event-accepted-tentatively.png" alt="Events">
+            <h2>Events & News</h2>
+            <div class="submenu">
+                <a href="javascript:void(0)" onclick="handleLink('S134')">Upcoming Events</a>
+                <a href="javascript:void(0)" onclick="handleLink('S135')">Latest News</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleLink(sectionId) {
+            alert(`Navigating to section: ${sectionId}`); // Replace with actual logic
+        }
+
+        function handleNotifications() {
+            alert("Notifications clicked!"); // Replace with actual logic
+        }
+    </script>
+</body>
+</html>
