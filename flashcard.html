@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environmental Health Flashcards</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-mode {
+            background-color: #1e2a38;
+            color: #e0e0e0;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 2rem;
+            color: #2c7873;
+        }
+        body.dark-mode h1 {
+            color: #6ab04c;
+        }
+
+        /* Instructions Section */
+        .instructions {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            width: 100%;
+            max-width: 450px;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+        body.dark-mode .instructions {
+            background-color: #2e3b4e;
+        }
+        .instructions h2 {
+            font-size: 1.2rem;
+            color: #2c7873;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        body.dark-mode .instructions h2 {
+            color: #6ab04c;
+        }
+        .instructions ul {
+            list-style: none;
+            margin-top: 10px;
+            display: none;
+            font-size: 0.9rem;
+        }
+        .instructions ul.show {
+            display: block;
+        }
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        /* Flashcard Container */
+        .flashcard-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            height: 300px;
+            perspective: 1000px;
+            margin-bottom: 20px;
+        }
+        .flashcard {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease, opacity 0.3s;
+            opacity: 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+        }
+        .flashcard.active {
+            opacity: 1;
+            z-index: 10;
+        }
+        .flashcard-inner {
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s ease;
+            transform-style: preserve-3d;
+        }
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+        .front, .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 12px;
+            transition: background-color 0.3s;
+        }
+        body.dark-mode .front, body.dark-mode .back {
+            background-color: #2e3b4e;
+        }
+        .front {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #2c7873;
+        }
+        body.dark-mode .front {
+            color: #6ab04c;
+        }
+        .back {
+            font-size: 1rem;
+            color: #fff;
+            background-color: #2c7873;
+            transform: rotateY(180deg);
+        }
+        body.dark-mode .back {
+            background-color: #6ab04c;
+        }
+
+        /* Controls and Navigation */
+        .controls, .navigation {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            color: #fff;
+            background-color: #2c7873;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #256d68;
+        }
+        body.dark-mode button {
+            background-color: #6ab04c;
+        }
+        body.dark-mode button:hover {
+            background-color: #558e3d;
+        }
+
+        /* Progress Bar */
+        .progress {
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            font-size: 1rem;
+            color: #2c7873;
+        }
+        body.dark-mode .progress {
+            color: #6ab04c;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        body.dark-mode .progress-bar {
+            background-color: #3e4b5e;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #2c7873;
+            transition: width 0.3s;
+        }
+        body.dark-mode .progress-fill {
+            background-color: #6ab04c;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 500px) {
+            .flashcard-container {
+                max-width: 100%;
+                height: 250px;
+            }
+            .front, .back {
+                font-size: 1rem;
+                padding: 15px;
+            }
+            button {
+                padding: 8px 15px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>Environmental Health Flashcards</h1>
+    </header>
+
+    <div class="instructions">
+        <h2 onclick="toggleInstructions()">Instructions <span>▼</span></h2>
+        <ul id="instructionsList">
+            <li><strong>Flip:</strong> Click a card to reveal the answer.</li>
+            <li><strong>Navigate:</strong> Use "Previous" and "Next" to move through cards.</li>
+            <li><strong>Shuffle:</strong> Randomize card order.</li>
+            <li><strong>Mark Learned:</strong> Tag mastered cards (turns green).</li>
+            <li><strong>Reset:</strong> Clear progress and start over.</li>
+            <li><strong>Dark Mode:</strong> Toggle for a night-friendly view.</li>
+            <li><strong>Progress:</strong> Track your position and learned cards below.</li>
+        </ul>
+    </div>
+
+    <div class="flashcard-container" id="flashcardContainer">
+        <!-- 100 Environmental Health Flashcards -->
+        <div class="flashcard active" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is environmental health?</div><div class="back">The branch of public health addressing environmental factors impacting human health.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is toxicology?</div><div class="back">The study of adverse effects of chemical agents on living organisms.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is an environmental hazard?</div><div class="back">Any physical, chemical, or biological factor that can harm health.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is the dose-response relationship?</div><div class="back">The correlation between exposure level and health effect severity.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is biomonitoring?</div><div class="back">Measuring chemicals in human tissues to assess exposure.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is the Clean Air Act?</div><div class="back">U.S. law regulating air pollution to protect public health.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is environmental epidemiology?</div><div class="back">The study of environmental exposures and disease distribution.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a point source pollutant?</div><div class="back">A single, identifiable source of pollution (e.g., a factory).</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is non-point source pollution?</div><div class="back">Diffuse pollution from multiple sources (e.g., runoff).</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is the precautionary principle?</div><div class="back">Taking preventive action when an activity poses potential harm, despite uncertainty.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is bioaccumulation?</div><div class="back">The buildup of toxic substances in an organism over time.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is biomagnification?</div><div class="back">The increasing concentration of toxins up the food chain.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is the role of OSHA?</div><div class="back">To ensure safe working conditions under U.S. occupational health standards.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is an ecological footprint?</div><div class="back">A measure of human demand on Earth's resources.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is sustainability in environmental health?</div><div class="back">Balancing resource use to protect health for future generations.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a heat island effect?</div><div class="back">Urban areas becoming warmer due to human activity and infrastructure.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is an environmental impact assessment (EIA)?</div><div class="back">Evaluating the environmental consequences of proposed projects.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is particulate matter (PM)?</div><div class="back">Tiny air pollutants linked to respiratory and cardiovascular issues.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is the greenhouse effect?</div><div class="back">Trapping of heat by atmospheric gases, influencing climate change.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is endocrine disruption?</div><div class="back">Chemicals interfering with hormone systems, affecting health.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is the Safe Drinking Water Act?</div><div class="back">U.S. law ensuring safe public water supplies.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a waterborne disease?</div><div class="back">Illness from contaminated water (e.g., cholera).</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is an occupational hazard?</div><div class="back">A workplace condition risking health (e.g., asbestos).</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is environmental justice?</div><div class="back">Ensuring fair treatment in environmental health risks.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a risk assessment?</div><div class="back">Evaluating the potential harm of environmental exposures.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is climate change adaptation?</div><div class="back">Adjusting health systems to climate impacts.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is indoor air quality?</div><div class="back">The condition of air within buildings affecting health.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is noise pollution?</div><div class="back">Excessive sound levels harming health.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a vector-borne disease?</div><div class="back">Illness transmitted by organisms like mosquitoes (e.g., malaria).</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is soil contamination?</div><div class="back">Pollution of soil with hazardous substances.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is radon?</div><div class="back">A radioactive gas from soil linked to lung cancer.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is the EPA?</div><div class="back">U.S. Environmental Protection Agency, regulating environmental safety.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is VOC?</div><div class="back">Volatile Organic Compounds, chemicals emitting harmful gases.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is acid rain?</div><div class="back">Precipitation with high acidity from pollutants like sulfur dioxide.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is eutrophication?</div><div class="back">Excess nutrients in water causing algal blooms and oxygen depletion.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is the ozone layer?</div><div class="back">A stratospheric layer protecting Earth from UV radiation.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What are CFCs?</div><div class="back">Chlorofluorocarbons, chemicals depleting the ozone layer.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is thermal pollution?</div><div class="back">Water temperature changes harming aquatic ecosystems.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a carcinogen?</div><div class="back">A substance capable of causing cancer.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is LD50?</div><div class="back">The lethal dose killing 50% of a test population.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is an allergen?</div><div class="back">A substance triggering an allergic reaction.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is the Superfund program?</div><div class="back">U.S. initiative to clean up hazardous waste sites.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a brownfield?</div><div class="back">Abandoned land contaminated by pollutants.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a greenfield?</div><div class="back">Undeveloped land free of contamination.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is deforestation?</div><div class="back">Clearing forests, impacting air quality and climate.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is desertification?</div><div class="back">Land degradation into desert-like conditions.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is biodiversity?</div><div class="back">Variety of life forms supporting ecosystem health.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is an ecosystem service?</div><div class="back">Benefits humans gain from ecosystems (e.g., clean water).</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is the Kyoto Protocol?</div><div class="back">International treaty to reduce greenhouse gas emissions.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is the Paris Agreement?</div><div class="back">Global pact to limit climate change impacts.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a carbon footprint?</div><div class="back">Total greenhouse gas emissions from an individual or activity.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is renewable energy?</div><div class="back">Energy from sustainable sources like solar or wind.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a landfill?</div><div class="back">A site for waste disposal, posing contamination risks.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is leachate?</div><div class="back">Liquid from landfills that can pollute groundwater.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is incineration?</div><div class="back">Burning waste, potentially releasing toxins.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is recycling?</div><div class="back">Processing waste into reusable materials.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is composting?</div><div class="back">Decomposing organic waste into fertilizer.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a pesticide?</div><div class="back">A chemical used to kill pests, with health risks.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is an herbicide?</div><div class="back">A chemical used to kill weeds, potentially toxic.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is integrated pest management (IPM)?</div><div class="back">A sustainable approach to pest control minimizing chemicals.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a heavy metal?</div><div class="back">Toxic elements like lead or mercury in the environment.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is chelation?</div><div class="back">Binding heavy metals to reduce toxicity in the body.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is asbestos?</div><div class="back">A mineral fiber linked to lung diseases like mesothelioma.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is silicosis?</div><div class="back">A lung disease from inhaling silica dust.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is ergonomics?</div><div class="back">Designing workplaces to reduce physical strain.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is sick building syndrome?</div><div class="back">Health issues linked to poor indoor environments.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a zoonotic disease?</div><div class="back">An illness transmitted from animals to humans.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is the One Health approach?</div><div class="back">Integrating human, animal, and environmental health.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a sentinel species?</div><div class="back">An organism indicating environmental health risks.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a food desert?</div><div class="back">An area with limited access to healthy food, tied to pollution.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is urban sprawl?</div><div class="back">Unplanned expansion increasing pollution and health risks.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a green building?</div><div class="back">A structure designed to reduce environmental impact.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is LEED certification?</div><div class="back">A standard for sustainable building design.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is environmental racism?</div><div class="back">Disproportionate pollution exposure in minority communities.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a health impact assessment (HIA)?</div><div class="back">Evaluating health effects of environmental policies.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is the precautionary approach?</div><div class="back">Acting to prevent harm before full scientific proof.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a pollutant standard index (PSI)?</div><div class="back">A measure of air quality and health risk.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is photochemical smog?</div><div class="back">Air pollution from sunlight and vehicle emissions.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is an inversion layer?</div><div class="back">A weather condition trapping pollutants near the ground.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is groundwater?</div><div class="back">Water beneath the Earth’s surface, vulnerable to contamination.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a watershed?</div><div class="back">An area draining into a common water body.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is salinization?</div><div class="back">Soil degradation from salt accumulation.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is overfishing?</div><div class="back">Excessive fishing harming marine ecosystems.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is aquaculture?</div><div class="back">Farming aquatic organisms, with pollution risks.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a dead zone?</div><div class="back">Water area with low oxygen from nutrient pollution.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is bioremediation?</div><div class="back">Using organisms to clean up pollution.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is phytoremediation?</div><div class="back">Using plants to remove contaminants from soil or water.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a keystone species?</div><div class="back">A species critical to ecosystem stability.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is habitat fragmentation?</div><div class="back">Breaking ecosystems into smaller, isolated parts.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is an invasive species?</div><div class="back">A non-native organism disrupting ecosystems.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is the tragedy of the commons?</div><div class="back">Overuse of shared resources harming all users.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is environmental stewardship?</div><div class="back">Responsible management of natural resources.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is the triple bottom line?</div><div class="back">Balancing social, environmental, and economic goals.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is eco-efficiency?</div><div class="back">Producing more with less environmental impact.</div></div></div>
+        <div class="flashcard" data-learned="false" data-course="Environmental"><div class="flashcard-inner"><div class="front">What is a circular economy?</div><div class="back">A system minimizing waste through reuse and recycling.</div></div></div>
+    </div>
+
+    <div class="navigation">
+        <button id="prevBtn">Previous</button>
+        <button id="nextBtn">Next</button>
+    </div>
+
+    <div class="controls">
+        <button id="shuffleBtn">Shuffle</button>
+        <button id="markLearnedBtn">Mark Learned</button>
+        <button id="resetBtn">Reset</button>
+        <button id="darkModeBtn">Dark Mode</button>
+    </div>
+
+    <div class="progress">
+        <span id="progressText">Card 1/100 | Learned: 0</span>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 1%;"></div></div>
+    </div>
+
+    <script>
+        // Core Variables
+        const allFlashcards = Array.from(document.querySelectorAll('.flashcard'));
+        let activeFlashcards = [...allFlashcards];
+        let currentIndex = 0;
+        let learnedCount = 0;
+
+        // DOM Elements
+        const container = document.getElementById('flashcardContainer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const markLearnedBtn = document.getElementById('markLearnedBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const darkModeBtn = document.getElementById('darkModeBtn');
+        const progressText = document.getElementById('progressText');
+        const progressFill = document.getElementById('progressFill');
+
+        // Update Display
+        function updateDisplay() {
+            activeFlashcards.forEach((card, index) => {
+                card.classList.toggle('active', index === currentIndex);
+            });
+            const totalCards = activeFlashcards.length;
+            progressText.textContent = `Card ${currentIndex + 1}/${totalCards} | Learned: ${learnedCount}`;
+            progressFill.style.width = `${((currentIndex + 1) / totalCards) * 100}%`;
+        }
+
+        // Flip Card
+        allFlashcards.forEach(card => {
+            card.addEventListener('click', () => {
+                card.classList.toggle('flipped');
+            });
+        });
+
+        // Navigation
+        prevBtn.addEventListener('click', () => {
+            activeFlashcards[currentIndex].classList.remove('flipped');
+            currentIndex = (currentIndex - 1 + activeFlashcards.length) % activeFlashcards.length;
+            updateDisplay();
+        });
+
+        nextBtn.addEventListener('click', () => {
+            activeFlashcards[currentIndex].classList.remove('flipped');
+            currentIndex = (currentIndex + 1) % activeFlashcards.length;
+            updateDisplay();
+        });
+
+        // Shuffle Cards
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        shuffleBtn.addEventListener('click', () => {
+            activeFlashcards = shuffle([...activeFlashcards]);
+            currentIndex = 0;
+            activeFlashcards.forEach((card, index) => {
+                card.style.order = index;
+            });
+            updateDisplay();
+        });
+
+        // Mark as Learned
+        markLearnedBtn.addEventListener('click', () => {
+            const currentCard = activeFlashcards[currentIndex];
+            if (currentCard.dataset.learned === 'false') {
+                currentCard.dataset.learned = 'true';
+                learnedCount++;
+                currentCard.querySelector('.front').style.backgroundColor = '#d4edda'; // Light green
+            }
+            updateDisplay();
+        });
+
+        // Reset
+        resetBtn.addEventListener('click', () => {
+            allFlashcards.forEach(card => {
+                card.dataset.learned = 'false';
+                card.classList.remove('flipped');
+                card.querySelector('.front').style.backgroundColor = '';
+            });
+            activeFlashcards = [...allFlashcards];
+            learnedCount = 0;
+            currentIndex = 0;
+            updateDisplay();
+        });
+
+        // Dark Mode Toggle
+        darkModeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            darkModeBtn.textContent = document.body.classList.contains('dark-mode') ? 'Light Mode' : 'Dark Mode';
+        });
+
+        // Instructions Toggle
+        function toggleInstructions() {
+            const list = document.getElementById('instructionsList');
+            list.classList.toggle('show');
+            const arrow = document.querySelector('.instructions h2 span');
+            arrow.textContent = list.classList.contains('show') ? '▲' : '▼';
+        }
+
+        // Initialize
+        updateDisplay();
+    </script>
+</body>
+</html>
