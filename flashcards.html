@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environmental Health Flashcards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-light: #34d399;
+            --secondary: #059669;
+            --accent: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #1e293b;
+        }
+        
+        * {
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+        
+        .card-container {
+            perspective: 1200px;
+        }
+        
+        .flashcard {
+            position: relative;
+            width: 100%;
+            height: 480px;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+            justify-content: center;
+        }
+        
+        .card-front {
+            background: linear-gradient(145deg, #ffffff 0%, #f0fdf4 100%);
+            border: 1px solid #d1fae5;
+        }
+        
+        .card-back {
+            background: linear-gradient(145deg, #f0fdf4 0%, #d1fae5 100%);
+            transform: rotateY(180deg);
+            text-align: left;
+            overflow-y: auto;
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+            transition: stroke-dashoffset 0.5s;
+            transform-origin: 50% 50%;
+        }
+        
+        .progress-ring-circle {
+            stroke-width: 8;
+            stroke: var(--primary);
+            fill: transparent;
+            stroke-dasharray: 800, 800;
+        }
+        
+        .difficulty-badge {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .difficulty-1 { background-color: var(--success); }
+        .difficulty-2 { background-color: var(--warning); }
+        .difficulty-3 { background-color: var(--danger); }
+        
+        .nav-button {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .nav-button:disabled {
+            background: linear-gradient(to right, #cbd5e1, #94a3b8);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .flip-button {
+            background: linear-gradient(to right, var(--primary-light), var(--primary));
+            color: white;
+            border: none;
+            border-radius: 2rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .flip-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .course-button {
+            background: white;
+            border: 2px solid #d1fae5;
+            border-radius: 1rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+            transition: all 0.3s ease;
+        }
+        
+        .course-button.active {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .course-button:hover:not(.active) {
+            border-color: var(--primary-light);
+            transform: translateY(-3px);
+        }
+        
+        .stats-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .stats-number {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+        
+        .stats-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 0.5rem;
+        }
+        
+        .mode-toggle {
+            display: flex;
+            background: #ecfdf5;
+            border-radius: 1.5rem;
+            padding: 0.25rem;
+        }
+        
+        .mode-option {
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: #64748b;
+        }
+        
+        .mode-option.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-counter {
+            font-variant-numeric: tabular-nums;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        @media (max-width: 768px) {
+            .flashcard {
+                height: 400px;
+            }
+            
+            .card-face {
+                padding: 1.5rem;
+            }
+            
+            .nav-button {
+                width: 50px;
+                height: 50px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .flashcard {
+                height: 380px;
+            }
+            
+            .card-face {
+                padding: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="min-h-screen py-8 px-4">
+        <div class="max-w-6xl mx-auto">
+            <!-- Header -->
+            <header class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-slate-800 mb-2">Environmental Health Flashcards</h1>
+                <p class="text-slate-600">Master environmental health concepts with interactive flashcards</p>
+            </header>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left sidebar - Course selection and stats -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- Course selection -->
+                    <div class="bg-white rounded-2xl p-6 shadow-lg">
+                        <h2 class="text-xl font-semibold text-slate-800 mb-4">Select Course</h2>
+                        <div class="grid grid-cols-2 gap-3" id="course-buttons">
+                            <!-- Course buttons will be generated here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Study stats -->
+                    <div class="bg-white rounded-2xl p-6 shadow-lg">
+                        <h2 class="text-xl font-semibold text-slate-800 mb-4">Study Progress</h2>
+                        <div class="grid grid-cols-3 gap-4 mb-4">
+                            <div class="stats-card">
+                                <div class="stats-number" id="total-cards">0</div>
+                                <div class="stats-label">Total Cards</div>
+                            </div>
+                            <div class="stats-card">
+                                <div class="stats-number" id="studied-today">0</div>
+                                <div class="stats-label">Studied Today</div>
+                            </div>
+                            <div class="stats-card">
+                                <div class="stats-number" id="mastered">0</div>
+                                <div class="stats-label">Mastered</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Progress ring -->
+                        <div class="flex justify-center items-center relative w-32 h-32 mx-auto">
+                            <svg class="w-full h-full" viewBox="0 0 100 100">
+                                <circle class="text-slate-200" stroke-width="8" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50" />
+                                <circle
+                                    class="progress-ring-circle"
+                                    stroke-width="8"
+                                    stroke-linecap="round"
+                                    stroke="currentColor"
+                                    fill="transparent"
+                                    r="40"
+                                    cx="50"
+                                    cy="50"
+                                    stroke-dasharray="800"
+                                    stroke-dashoffset="800"
+                                    id="progress-circle"
+                                />
+                            </svg>
+                            <div class="absolute text-center">
+                                <span class="text-2xl font-bold text-slate-800" id="progress-percentage">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Study mode toggle -->
+                    <div class="bg-white rounded-2xl p-6 shadow-lg">
+                        <h2 class="text-xl font-semibold text-slate-800 mb-4">Study Mode</h2>
+                        <div class="mode-toggle">
+                            <div class="mode-option active" id="sequential-mode">
+                                Sequential
+                            </div>
+                            <div class="mode-option" id="random-mode">
+                                Random
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main content - Flashcard -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-2xl p-8 shadow-lg">
+                        <!-- Card counter -->
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="text-slate-600 font-medium">
+                                <span class="card-counter" id="current-card">1</span>
+                                <span> / </span>
+                                <span id="total-course-cards">20</span>
+                            </div>
+                            <div class="text-sm font-medium text-slate-600" id="current-course">
+                                Air Quality
+                            </div>
+                        </div>
+                        
+                        <!-- Flashcard -->
+                        <div class="card-container mb-8" id="flashcard-container">
+                            <div class="flashcard" id="flashcard">
+                                <!-- Front of card -->
+                                <div class="card-face card-front">
+                                    <div class="difficulty-badge difficulty-2" id="difficulty-badge">
+                                        2
+                                    </div>
+                                    <div class="text-2xl font-semibold text-center text-slate-800" id="card-front">
+                                        What are the primary air pollutants of concern for human health?
+                                    </div>
+                                    <div class="absolute bottom-4 left-0 right-0 text-center text-slate-500 text-sm">
+                                        Click to flip
+                                    </div>
+                                </div>
+                                
+                                <!-- Back of card -->
+                                <div class="card-face card-back">
+                                    <div class="difficulty-badge difficulty-2" id="difficulty-badge-back">
+                                        2
+                                    </div>
+                                    <div class="text-lg text-slate-700" id="card-back">
+                                        The six primary air pollutants (criteria pollutants) are: particulate matter (PM), ground-level ozone, carbon monoxide, sulfur dioxide, nitrogen dioxide, and lead. These pollutants can cause respiratory problems, cardiovascular issues, and other serious health effects, especially in vulnerable populations.
+                                    </div>
+                                    <div class="absolute bottom-4 left-0 right-0 text-center text-slate-500 text-sm">
+                                        Click to flip back
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Card controls -->
+                        <div class="flex justify-between items-center">
+                            <button class="nav-button" id="prev-button">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            
+                            <button class="flip-button" id="flip-button">
+                                Show Answer
+                            </button>
+                            
+                            <button class="nav-button" id="next-button">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Difficulty legend -->
+                    <div class="mt-6 bg-white rounded-2xl p-6 shadow-lg">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-3">Difficulty Levels</h3>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 rounded-full bg-green-500 mr-2 flex items-center justify-center text-white text-xs">1</div>
+                                <span class="text-sm text-slate-700">Easy</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 rounded-full bg-yellow-500 mr-2 flex items-center justify-center text-white text-xs">2</div>
+                                <span class="text-sm text-slate-700">Medium</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 rounded-full bg-red-500 mr-2 flex items-center justify-center text-white text-xs">3</div>
+                                <span class="text-sm text-slate-700">Hard</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Environmental Health Flashcard Data
+        const flashcardsData = {
+            "Air Quality": [
+                {
+                    front: "What are the primary air pollutants of concern for human health?",
+                    back: "The six primary air pollutants (criteria pollutants) are: particulate matter (PM), ground-level ozone, carbon monoxide, sulfur dioxide, nitrogen dioxide, and lead. These pollutants can cause respiratory problems, cardiovascular issues, and other serious health effects, especially in vulnerable populations.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does particulate matter (PM2.5) affect human health?",
+                    back: "PM2.5 refers to fine inhalable particles with diameters 2.5 micrometers and smaller. These particles can penetrate deep into the lungs and even enter the bloodstream, causing respiratory and cardiovascular problems, aggravated asthma, decreased lung function, and premature death in people with heart or lung disease.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the Air Quality Index (AQI) and how is it used?",
+                    back: "The AQI is an index for reporting daily air quality. It indicates how clean or polluted the air is and what associated health effects might be a concern. The AQI focuses on health effects experienced within a few hours or days after breathing polluted air, with categories ranging from Good (0-50) to Hazardous (301-500).",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the main sources of indoor air pollution?",
+                    back: "Common sources include: combustion sources (tobacco, stoves, fireplaces), building materials (asbestos, formaldehyde), household products, outdoor air pollutants entering buildings, biological contaminants (mold, dust mites), and radon gas. Poor ventilation can increase indoor pollutant levels.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does climate change impact air quality?",
+                    back: "Climate change can worsen air quality through: increased temperatures accelerating chemical reactions that form ground-level ozone, changing weather patterns affecting pollutant dispersion, increased wildfires producing more particulate matter, and longer pollen seasons worsening allergic respiratory diseases.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is sick building syndrome?",
+                    back: "Sick building syndrome describes situations where building occupants experience acute health and comfort effects that appear linked to time spent in a building, but no specific illness or cause can be identified. Complaints may include headache, eye/nose/throat irritation, fatigue, and dizziness, often relieved after leaving the building.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the health effects of exposure to ozone?",
+                    back: "Ozone exposure can cause: coughing and throat irritation, aggravated asthma and other lung diseases, reduced lung function, inflammation of lung tissues, and increased susceptibility to respiratory infections. Children, outdoor workers, and people with respiratory diseases are particularly vulnerable.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does carbon monoxide poisoning occur?",
+                    back: "CO poisoning occurs when carbon monoxide builds up in the bloodstream. When too much CO is in the air, your body replaces oxygen in red blood cells with CO, leading to tissue damage. Sources include malfunctioning fuel-burning appliances, vehicles running in enclosed spaces, and blocked chimneys.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is asbestos and why is it dangerous?",
+                    back: "Asbestos is a group of naturally occurring fibrous minerals once widely used in construction for insulation and fireproofing. When disturbed, asbestos fibers become airborne and can be inhaled, leading to asbestosis, lung cancer, and mesothelioma—often decades after exposure.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are VOCs and where are they commonly found?",
+                    back: "Volatile Organic Compounds (VOCs) are chemicals that easily become vapors or gases. Common sources include: paints, paint strippers, cleaning supplies, pesticides, building materials, office equipment, and craft materials. VOCs can cause eye/nose/throat irritation, headaches, and some are known carcinogens.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is radon and how does it enter buildings?",
+                    back: "Radon is a radioactive gas that forms naturally from the decay of uranium in soil, rock, and water. It enters buildings through cracks in floors and walls, construction joints, gaps around service pipes, and well water. Radon is the second leading cause of lung cancer after smoking.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the health impacts of lead exposure?",
+                    back: "Lead exposure can affect nearly every system in the body. In children, it can cause: behavior and learning problems, lower IQ, slowed growth, hearing problems, and anemia. In adults, it can cause: cardiovascular effects, increased blood pressure, decreased kidney function, and reproductive problems.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does air pollution affect children differently than adults?",
+                    back: "Children are more vulnerable because: they breathe more air per body weight, their organs are still developing, they spend more time outdoors, and they're more likely to have asthma. Air pollution can cause reduced lung development, increased respiratory infections, and exacerbated asthma symptoms.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the difference between primary and secondary air pollutants?",
+                    back: "Primary pollutants are emitted directly from sources (e.g., carbon monoxide from vehicles). Secondary pollutants form in the atmosphere through chemical reactions (e.g., ozone formed when nitrogen oxides and VOCs react in sunlight). Both types can harm human health and the environment.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the health benefits of reducing air pollution?",
+                    back: "Reducing air pollution can: decrease premature deaths, reduce respiratory and cardiovascular hospitalizations, decrease asthma exacerbations, improve lung function in children, reduce days of work/school lost, and lower healthcare costs. Even small improvements in air quality provide significant health benefits.",
+                    difficulty: 2
+                },
+                {
+                    front: "How do wildfires impact air quality and health?",
+                    back: "Wildfires produce massive amounts of smoke containing particulate matter, carbon monoxide, VOCs, and other pollutants. This can worsen air quality hundreds of miles downwind, causing respiratory problems, cardiovascular issues, and eye irritation. Vulnerable groups should stay indoors during smoke events.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is environmental justice in the context of air quality?",
+                    back: "Environmental justice recognizes that minority and low-income populations often bear disproportionate exposure to air pollution and its health effects. These communities may be located near industrial facilities, highways, or other pollution sources, and may have less resources to address these inequities.",
+                    difficulty: 3
+                },
+                {
+                    front: "How does air pollution affect cognitive function?",
+                    back: "Research suggests air pollution, particularly fine particulate matter, may negatively affect cognitive function. Studies have linked exposure to reduced cognitive performance, increased risk of dementia, and poorer academic performance in children. The mechanisms may involve inflammation and oxidative stress in the brain.",
+                    difficulty: 3
+                },
+                {
+                    front: "What are the main strategies for improving indoor air quality?",
+                    back: "Key strategies include: source control (removing or reducing pollution sources), ventilation (bringing in outdoor air), air cleaning (using filters), and maintaining appropriate humidity levels (30-50% to reduce mold and dust mites). Houseplants have limited effect on indoor air quality.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does transportation contribute to air pollution?",
+                    back: "Transportation is a major source of air pollution, emitting: nitrogen oxides, carbon monoxide, particulate matter, VOCs, and greenhouse gases. Vehicles contribute to ground-level ozone formation and are significant sources of urban air pollution. Electric vehicles and improved public transit can reduce these emissions.",
+                    difficulty: 2
+                }
+            ],
+            "Water Quality": [
+                {
+                    front: "What are the main sources of water pollution?",
+                    back: "Major sources include: agricultural runoff (pesticides, fertilizers), industrial discharges, municipal wastewater, stormwater runoff, mining activities, and atmospheric deposition. These can introduce pathogens, nutrients, chemicals, and other contaminants into water bodies.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the Safe Drinking Water Act?",
+                    back: "The Safe Drinking Water Act (SDWA) is the main federal law ensuring the quality of Americans' drinking water. It authorizes EPA to set national health-based standards for drinking water to protect against both naturally-occurring and man-made contaminants.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are coliform bacteria and why are they monitored?",
+                    back: "Coliform bacteria are a group of bacteria used as indicators of water quality. While not necessarily pathogenic themselves, their presence suggests possible contamination by fecal matter and that disease-causing organisms (pathogens) might be present. Monitoring coliforms is a standard water quality testing practice.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is eutrophication and how does it affect water quality?",
+                    back: "Eutrophication is the excessive enrichment of water by nutrients (especially nitrogen and phosphorus), leading to algal blooms. When algae die and decompose, oxygen is depleted, creating 'dead zones' where aquatic life cannot survive. This process degrades water quality and ecosystem health.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are PFAS chemicals and why are they concerning?",
+                    back: "Per- and polyfluoroalkyl substances (PFAS) are synthetic chemicals used in many products for their water- and stain-resistant properties. They're concerning because they persist in the environment, accumulate in the body, and have been linked to various health effects including cancer, thyroid issues, and developmental problems.",
+                    difficulty: 3
+                },
+                {
+                    front: "How does lead enter drinking water?",
+                    back: "Lead typically enters drinking water through corrosion of plumbing materials containing lead. This can include lead pipes, solder, and brass fixtures. The problem is more common in older homes and cities with older infrastructure. Water chemistry and temperature can affect how much lead leaches into water.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is arsenic and how does it contaminate water?",
+                    back: "Arsenic is a naturally occurring element that can contaminate groundwater through dissolution of minerals and ores. It can also enter water from industrial and agricultural sources. Long-term exposure to arsenic in drinking water is associated with skin lesions, cancer, cardiovascular disease, and developmental effects.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the health effects of waterborne diseases?",
+                    back: "Waterborne diseases (caused by pathogens in contaminated water) can cause gastrointestinal illness (diarrhea, vomiting), skin infections, respiratory illness, and more serious conditions like cholera and typhoid. Vulnerable populations including children, elderly, and immunocompromised individuals are at greatest risk.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the difference between point source and nonpoint source pollution?",
+                    back: "Point source pollution comes from a single, identifiable source (e.g., factory pipe, wastewater treatment plant). Nonpoint source pollution comes from diffuse sources (e.g., agricultural runoff, urban stormwater). Nonpoint sources are more difficult to regulate and control.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does climate change affect water quality?",
+                    back: "Climate change can: increase water temperatures affecting aquatic life, intensify algal blooms, increase runoff of pollutants during heavy rainfall, cause saltwater intrusion in coastal aquifers, and alter precipitation patterns affecting water availability. These changes can challenge water treatment systems.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is groundwater contamination and why is it difficult to address?",
+                    back: "Groundwater contamination occurs when pollutants enter aquifers. It's difficult to address because: contaminants can persist for decades, groundwater moves slowly making plumes hard to contain, detection often occurs after extensive contamination, and remediation is costly and time-consuming.",
+                    difficulty: 3
+                },
+                {
+                    front: "What are the main steps in conventional water treatment?",
+                    back: "Conventional treatment typically includes: coagulation/flocculation (clumping particles), sedimentation (settling), filtration (removing particles), and disinfection (killing pathogens). Additional treatments may be added for specific contaminants like activated carbon for organic chemicals or reverse osmosis for dissolved solids.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the health risks associated with disinfection byproducts?",
+                    back: "Disinfection byproducts (DBPs) form when disinfectants react with natural organic matter in water. Some DBPs are associated with increased cancer risk and reproductive problems. Regulated DBPs include trihalomethanes and haloacetic acids. Water systems must balance microbial safety with DBP formation.",
+                    difficulty: 3
+                },
+                {
+                    front: "How does agricultural runoff affect water quality?",
+                    back: "Agricultural runoff can carry: fertilizers (causing eutrophication), pesticides (potential toxins), sediment (clouding water, carrying pollutants), and animal waste (pathogens, nutrients). This runoff is a major source of nonpoint pollution affecting both surface and groundwater quality.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the significance of watershed protection?",
+                    back: "Watershed protection involves managing land and water resources to maintain water quality. Protecting watersheds is more cost-effective than treating contaminated water, helps maintain ecosystem health, preserves recreational opportunities, and ensures sustainable water supplies for communities.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are emerging contaminants in water?",
+                    back: "Emerging contaminants include pharmaceuticals, personal care products, endocrine-disrupting chemicals, and microplastics. These substances are not completely removed by conventional treatment, are increasingly detected in water supplies, and may have unknown or poorly understood health effects at low concentrations.",
+                    difficulty: 3
+                },
+                {
+                    front: "How does water scarcity impact public health?",
+                    back: "Water scarcity can lead to: inadequate hygiene increasing disease transmission, use of unsafe alternative water sources, concentration of pollutants in limited water supplies, food insecurity due to irrigation limitations, and conflicts over water resources. These impacts disproportionately affect vulnerable populations.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the role of wetlands in water quality?",
+                    back: "Wetlands act as natural water filters by: trapping sediments, absorbing excess nutrients, breaking down pollutants, and processing organic matter. They also help control flooding and provide wildlife habitat. Protecting and restoring wetlands is an important strategy for improving water quality.",
+                    difficulty: 2
+                },
+                {
+                    front: "How do microplastics enter water systems and what are their impacts?",
+                    back: "Microplastics enter through: breakdown of larger plastic items, microbeads from personal care products, synthetic fibers from laundry, and atmospheric deposition. Impacts include: ingestion by aquatic organisms (potentially entering food chain), acting as vectors for other pollutants, and potential human health effects still being studied.",
+                    difficulty: 3
+                },
+                {
+                    front: "What are the main challenges in providing safe drinking water globally?",
+                    back: "Challenges include: infrastructure limitations, contamination from human and animal waste, natural contaminants like arsenic and fluoride, climate change impacts, poverty and inequality, political instability, and inadequate governance. Over 2 billion people lack access to safely managed drinking water services.",
+                    difficulty: 3
+                }
+            ],
+            "Food Safety": [
+                {
+                    front: "What are the most common foodborne pathogens?",
+                    back: "Common pathogens include: Salmonella, Campylobacter, E. coli O157:H7, Listeria, Norovirus, and Clostridium perfringens. These microorganisms can cause illnesses ranging from mild gastroenteritis to life-threatening conditions, particularly in vulnerable populations.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the temperature danger zone for food?",
+                    back: "The temperature danger zone is between 40°F and 140°F (4°C and 60°C). In this range, bacteria multiply rapidly. Food should not be left in this zone for more than 2 hours (or 1 hour if temperature is above 90°F/32°C).",
+                    difficulty: 1
+                },
+                {
+                    front: "What are the main principles of HACCP?",
+                    back: "Hazard Analysis Critical Control Point (HACCP) principles include: conducting hazard analysis, identifying critical control points, establishing critical limits, monitoring procedures, corrective actions, verification procedures, and record-keeping. This systematic approach prevents food safety hazards rather than reacting to problems.",
+                    difficulty: 3
+                },
+                {
+                    front: "How does cross-contamination occur in food preparation?",
+                    back: "Cross-contamination occurs when harmful microorganisms are transferred from one surface to another. Common examples include: using the same cutting board for raw meat and ready-to-eat foods, not washing hands between handling different foods, and using contaminated utensils or equipment.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are food allergies and how should they be managed in food service?",
+                    back: "Food allergies are immune responses to specific proteins in foods. Management includes: proper ingredient labeling, preventing cross-contact during preparation, staff training on allergen awareness, clear communication with customers, and having emergency protocols for allergic reactions.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the role of the FDA in food safety?",
+                    back: "The FDA regulates: all domestic and imported food except meat, poultry, and processed egg products; animal drugs and feed; and establishes science-based standards for safe food production. The FDA also oversees food labeling and nutrition information.",
+                    difficulty: 2
+                },
+                {
+                    front: "How do pesticides residues in food affect human health?",
+                    back: "Pesticide residues may pose health risks including: acute poisoning at high levels, chronic effects from long-term exposure (potential cancer risk, neurological effects, hormone disruption). Regulatory agencies set tolerance levels to minimize risks, but some populations (children, pregnant women) may be more vulnerable.",
+                    difficulty: 3
+                },
+                {
+                    front: "What are the main types of food spoilage and how can they be prevented?",
+                    back: "Spoilage types include: microbial (bacteria, molds, yeasts), enzymatic (natural food enzymes), chemical (oxidation), and physical (moisture loss). Prevention methods include: proper temperature control, packaging, preservatives, acidity control, and irradiation.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is food irradiation and is it safe?",
+                    back: "Food irradiation uses ionizing radiation to kill bacteria, parasites, and insects; delay spoilage; and inhibit sprouting. Major health organizations have determined irradiated food is safe, nutritious, and does not make food radioactive. Proper labeling is required for irradiated foods.",
+                    difficulty: 3
+                },
+                {
+                    front: "How does climate change affect food safety?",
+                    back: "Climate change can: increase mycotoxin contamination in crops, expand ranges of foodborne pathogens and pests, increase algal blooms affecting seafood safety, and create challenges for maintaining cold chains during extreme weather. These changes may require adaptations in food safety systems.",
+                    difficulty: 3
+                },
+                {
+                    front: "What are the health risks associated with heavy metals in food?",
+                    back: "Heavy metals like mercury, lead, cadmium, and arsenic can accumulate in the body and cause: neurological damage, kidney dysfunction, cardiovascular issues, and developmental problems in children. Certain foods (large predatory fish, rice, some leafy vegetables) may contain higher levels.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is the difference between foodborne infection and intoxication?",
+                    back: "Foodborne infection occurs when live pathogenic organisms are consumed and multiply in the body (e.g., Salmonella). Intoxication occurs when toxins produced by microorganisms are consumed (e.g., Staphylococcus aureus toxin). Intoxications often have quicker onset than infections.",
+                    difficulty: 2
+                },
+                {
+                    front: "How can consumers reduce the risk of foodborne illness at home?",
+                    back: "Key practices include: proper handwashing, preventing cross-contamination, cooking foods to safe temperatures, prompt refrigeration of leftovers, careful washing of fruits/vegetables, and avoiding high-risk foods (raw sprouts, unpasteurized products) if vulnerable.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the emerging challenges in food safety?",
+                    back: "Emerging challenges include: new pathogens and strains, antimicrobial resistance, globalization of food supply, complex food production processes, climate change impacts, and changing consumer habits (e.g., raw foods, online food delivery). These require updated food safety systems and regulations.",
+                    difficulty: 3
+                },
+                {
+                    front: "How does food packaging affect food safety?",
+                    back: "Packaging can: protect food from contamination, extend shelf life, provide barrier to moisture/oxygen, and convey safety information. However, packaging materials may contain chemicals that can migrate into food, requiring regulation and monitoring.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the main food safety concerns with fresh produce?",
+                    back: "Concerns include: contamination from irrigation water, soil, animals, or workers; difficulty in cleaning complex surfaces; lack of kill step for pathogens; and global supply chains. Outbreaks have involved lettuce, sprouts, berries, and other produce.",
+                    difficulty: 2
+                },
+                {
+                    front: "How is seafood safety monitored?",
+                    back: "Seafood safety involves monitoring for: natural toxins (e.g., in shellfish), pathogens, chemical contaminants (mercury, PCBs), parasites, and decomposition. Programs include: HACCP requirements for processors, fishing area closures when toxins detected, and consumption advisories for contaminated species.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is the significance of food safety culture in organizations?",
+                    back: "Food safety culture refers to shared values, beliefs, and norms affecting food safety behaviors. A positive culture emphasizes that food safety is everyone's responsibility, not just compliance. Organizations with strong safety cultures have better food safety outcomes.",
+                    difficulty: 3
+                },
+                {
+                    front: "How do food additives affect health?",
+                    back: "Most approved additives are safe for most people when consumed at permitted levels. Some individuals may be sensitive to specific additives. Ongoing research examines potential long-term effects of some additives, and regulatory agencies periodically re-evaluate safety based on new evidence.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the food safety considerations for vulnerable populations?",
+                    back: "Vulnerable groups (pregnant women, young children, elderly, immunocompromised) should avoid: raw or undercooked meats/seafood/eggs, unpasteurized products, raw sprouts, and soft cheeses. They are more susceptible to severe complications from foodborne illnesses and should follow additional precautions.",
+                    difficulty: 2
+                }
+            ],
+            "Toxicology": [
+                {
+                    front: "What is the basic principle of toxicology?",
+                    back: "The basic principle is 'the dose makes the poison' - all substances can be toxic at sufficient doses, while even toxic substances may be harmless at very low doses. The relationship between dose and response is fundamental to toxicology.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the main routes of exposure to toxic substances?",
+                    back: "The primary routes are: inhalation (breathing), ingestion (swallowing), dermal (skin contact), and injection. The route affects how quickly and completely a substance enters the body and which organs are most affected.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the difference between acute and chronic toxicity?",
+                    back: "Acute toxicity refers to adverse effects from a single exposure or multiple exposures within a short time (24 hours). Chronic toxicity results from repeated exposures over a longer period (months or years), often at lower doses, and may involve different effects than acute exposure.",
+                    difficulty: 2
+                },
+                {
+                    front: "What factors influence an individual's response to toxic substances?",
+                    back: "Factors include: age, genetics, sex, nutritional status, health status, pre-existing conditions, simultaneous exposures to other substances, and route/duration of exposure. These factors explain why people respond differently to the same toxic exposure.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is biomonitoring in toxicology?",
+                    back: "Biomonitoring measures chemicals or their metabolites in human tissues or fluids (blood, urine, hair). It helps assess exposure levels, understand how chemicals enter and leave the body, and evaluate the effectiveness of exposure reduction efforts.",
+                    difficulty: 3
+                },
+                {
+                    front: "What are the phases of toxicokinetics?",
+                    back: "Toxicokinetics describes how the body handles toxic substances through four phases: absorption (entry into body), distribution (transport throughout body), metabolism (chemical transformation), and excretion (removal from body). These processes determine the concentration of toxicant at target sites.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is the significance of the LD50 value?",
+                    back: "LD50 (Lethal Dose 50%) is the dose that kills 50% of test animals. It provides a standardized measure for comparing acute toxicity of substances. Lower LD50 values indicate higher toxicity. However, LD50 has limitations and alternative testing methods are increasingly used.",
+                    difficulty: 3
+                },
+                {
+                    front: "How do carcinogens cause cancer?",
+                    back: "Carcinogens can cause cancer through: DNA damage (genotoxic carcinogens), promoting cell growth (non-genotoxic carcinogens), or both. The process typically involves initiation (DNA damage), promotion (enhanced cell division), and progression (additional mutations leading to malignancy).",
+                    difficulty: 3
+                },
+                {
+                    front: "What are endocrine disruptors and how do they work?",
+                    back: "Endocrine disruptors interfere with the body's hormone systems. They may: mimic natural hormones, block hormone receptors, alter hormone production, or modify hormone transport. Effects can occur at very low doses and during sensitive developmental windows.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is the difference between hazard and risk?",
+                    back: "Hazard is the inherent potential of a substance to cause harm. Risk is the probability that harm will occur under specific exposure conditions. Risk assessment combines hazard identification with exposure assessment to determine actual danger.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the main types of toxic effects?",
+                    back: "Types include: local (at exposure site) vs systemic (throughout body), reversible vs irreversible, immediate vs delayed, and allergic reactions. Effects can target specific organs (hepatotoxicity, nephrotoxicity, neurotoxicity) or have broader systemic impacts.",
+                    difficulty: 2
+                },
+                {
+                    front: "How are reference doses (RfDs) established?",
+                    back: "Reference doses are estimates of daily exposure unlikely to cause adverse effects. They're derived from no-observed-adverse-effect levels (NOAELs) or benchmark doses from animal or human studies, with uncertainty factors applied to account for variability and data limitations.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is the role of epidemiology in toxicology?",
+                    back: "Epidemiology studies patterns and causes of health effects in human populations. It provides real-world evidence of toxicity, identifies associations between exposures and diseases, and helps validate findings from laboratory studies. Limitations include difficulty controlling confounding factors.",
+                    difficulty: 3
+                },
+                {
+                    front: "How do children's vulnerabilities to toxins differ from adults?",
+                    back: "Children are more vulnerable because: they have higher metabolic rates, organs still developing, more years of life ahead for delayed effects, different behaviors (hand-to-mouth), and greater exposure per body weight. Their detoxification systems may also be less developed.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the challenges in assessing mixture toxicity?",
+                    back: "Challenges include: countless possible combinations, different mechanisms of action, potential for additive/synergistic/antagonistic effects, limited testing data, and difficulty extrapolating from single chemicals. Mixture risk assessment is an active area of research.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is nanotoxicology?",
+                    back: "Nanotoxicology studies the toxicity of nanomaterials, which have unique properties due to their small size (1-100 nm). These materials may have different toxicity than bulk forms of the same substance, including enhanced ability to cross biological barriers and generate oxidative stress.",
+                    difficulty: 3
+                },
+                {
+                    front: "How does the body defend against toxic substances?",
+                    back: "Defenses include: physical barriers (skin), detoxification enzymes (cytochrome P450 system), antioxidant systems, DNA repair mechanisms, immune responses, and excretion processes. These systems can be overwhelmed by high doses or compromised by various factors.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the ethical considerations in toxicology testing?",
+                    back: "Considerations include: balancing animal welfare with human protection, implementing the 3Rs (Replacement, Reduction, Refinement), ensuring proper oversight of human studies, communicating risks transparently, and considering environmental impacts of testing methods.",
+                    difficulty: 3
+                },
+                {
+                    front: "How has toxicology contributed to public health regulations?",
+                    back: "Toxicology provides the scientific basis for: setting exposure limits, banning or restricting hazardous substances, establishing safety standards for products, developing remediation goals for contaminated sites, and creating protective policies for vulnerable populations.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are emerging concerns in toxicology?",
+                    back: "Emerging concerns include: microplastics and nanoplastics, e-waste components, new synthetic chemicals, cumulative impacts of multiple stressors, non-monotonic dose responses, and epigenetic effects. These challenges require advanced testing methods and updated risk assessment frameworks.",
+                    difficulty: 3
+                }
+            ],
+            "Occupational Health": [
+                {
+                    front: "What are the main types of occupational hazards?",
+                    back: "Occupational hazards include: chemical (solvents, dusts, fumes), physical (noise, radiation, temperature extremes), biological (viruses, bacteria, mold), ergonomic (repetitive motion, awkward postures), and psychosocial (stress, violence, long hours) hazards.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the role of OSHA in workplace safety?",
+                    back: "The Occupational Safety and Health Administration (OSHA) sets and enforces protective workplace safety and health standards, provides information/training/education, and maintains records of workplace injuries and illnesses. OSHA covers most private sector employers and workers.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are permissible exposure limits (PELs)?",
+                    back: "PELs are regulatory limits on the amount or concentration of a substance in the air. They're designed to protect workers from adverse health effects from exposure to hazardous substances. PELs are based on an 8-hour time-weighted average for a 40-hour work week.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does noise exposure affect hearing?",
+                    back: "Noise exposure can cause: temporary threshold shift (temporary hearing loss), permanent threshold shift (permanent hearing damage), tinnitus (ringing in ears), and difficulty communicating. Hearing loss from noise is cumulative and generally irreversible but preventable.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the elements of a respiratory protection program?",
+                    back: "A complete program includes: hazard assessment, proper respirator selection, medical evaluation of users, fit testing, training, cleaning/maintenance/storage, and program evaluation. OSHA requires written programs for workplaces where respirators are necessary.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is ergonomics and why is it important?",
+                    back: "Ergonomics is designing workplaces, equipment, and tasks to fit the worker. It's important for preventing musculoskeletal disorders (MSDs) like carpal tunnel syndrome, tendonitis, and back injuries. Good ergonomics improves comfort, productivity, and safety.",
+                    difficulty: 2
+                },
+                {
+                    front: "How can workplaces prevent needlestick injuries?",
+                    back: "Prevention strategies include: using safety-engineered sharp devices, proper disposal containers, never recapping needles, training on safe practices, vaccination against bloodborne diseases, and establishing exposure control plans as required by OSHA's Bloodborne Pathogens standard.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the health effects of asbestos exposure?",
+                    back: "Asbestos exposure can cause: asbestosis (lung scarring), lung cancer, mesothelioma (cancer of lung/abdominal lining), and pleural abnormalities. Diseases typically develop decades after exposure. There is no safe level of asbestos exposure for these diseases.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is sick building syndrome in occupational settings?",
+                    back: "Sick building syndrome describes situations where building occupants experience acute health effects that seem linked to time spent in a building. In workplaces, this can reduce productivity and increase absenteeism. Causes may include inadequate ventilation, chemical contaminants, or biological contaminants.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does shift work affect health?",
+                    back: "Shift work, especially night shifts, can disrupt circadian rhythms leading to: sleep disorders, gastrointestinal problems, increased cardiovascular risk, possible increased cancer risk, and mental health issues. It may also contribute to workplace accidents due to fatigue.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the main components of an effective safety program?",
+                    back: "Effective programs include: management commitment and employee involvement, worksite analysis, hazard prevention and control, and safety and health training. Programs should be tailored to the specific workplace and regularly evaluated for effectiveness.",
+                    difficulty: 2
+                },
+                {
+                    front: "How can workplaces address psychological hazards?",
+                    back: "Addressing psychological hazards involves: reducing excessive workloads, providing clear job expectations, offering support resources, preventing workplace violence/bullying, promoting work-life balance, and creating a positive organizational culture. Mental health is an important component of overall worker health.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the hierarchy of controls for hazard reduction?",
+                    back: "The hierarchy from most to least effective is: elimination (remove hazard), substitution (replace hazard), engineering controls (isolate people from hazard), administrative controls (change work practices), and personal protective equipment (protect workers).",
+                    difficulty: 2
+                },
+                {
+                    front: "How does heat stress affect workers?",
+                    back: "Heat stress can cause: heat rash, heat cramps, heat exhaustion, and heat stroke (a medical emergency). Risk factors include high temperature/humidity, direct sun, heavy physical labor, inadequate hydration, and certain personal factors (medications, medical conditions).",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the rights of workers regarding safety and health?",
+                    back: "Workers have the right to: a safe workplace, information about hazards, training, exposure and medical records, file a complaint with OSHA, participate in OSHA inspections, and be free from retaliation for exercising safety and health rights.",
+                    difficulty: 2
+                },
+                {
+                    front: "How can businesses prepare for emergency situations?",
+                    back: "Preparation includes: developing emergency action plans, conducting drills, installing alarm systems, maintaining first aid supplies, training employees in emergency procedures, establishing evacuation routes, and coordinating with local emergency services.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the emerging issues in occupational health?",
+                    back: "Emerging issues include: nanotechnology risks, ergonomics of computer work, psychosocial aspects of remote work, climate change impacts on outdoor workers, infectious disease preparedness, and an aging workforce with different health needs.",
+                    difficulty: 3
+                },
+                {
+                    front: "How does occupational health differ by industry?",
+                    back: "Different industries face different hazards: construction (falls, silica), healthcare (infectious diseases, needlesticks), agriculture (pesticides, machinery), manufacturing (noise, chemicals), and office work (ergonomics, stress). Prevention strategies must be industry-specific.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the role of occupational health nurses?",
+                    back: "Occupational health nurses: provide emergency care, conduct health assessments, monitor workplace hazards, develop health promotion programs, manage workers' compensation cases, maintain medical records, and serve as liaisons between employees and management regarding health issues.",
+                    difficulty: 2
+                },
+                {
+                    front: "How can small businesses implement effective safety programs?",
+                    back: "Small businesses can: prioritize major hazards, use free OSHA consultation services, engage employees in safety, implement simple low-cost solutions, provide basic training, maintain equipment properly, and document safety efforts. Many resources are tailored for small businesses.",
+                    difficulty: 2
+                }
+            ],
+            "Epidemiology": [
+                {
+                    front: "What is epidemiology?",
+                    back: "Epidemiology is the study of the distribution and determinants of health-related states or events in specified populations, and the application of this study to control health problems. It's often called the basic science of public health.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the main types of epidemiological studies?",
+                    back: "Main types include: descriptive studies (describe patterns), analytical studies (examine associations), observational studies (cohort, case-control, cross-sectional), and experimental studies (randomized controlled trials). Each has strengths and limitations for answering different research questions.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the difference between incidence and prevalence?",
+                    back: "Incidence measures new cases of a disease during a specified period. Prevalence measures all existing cases at a particular point in time. Incidence informs about risk, while prevalence indicates the overall burden of disease.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are sensitivity and specificity in diagnostic testing?",
+                    back: "Sensitivity measures a test's ability to correctly identify those with the disease (true positive rate). Specificity measures a test's ability to correctly identify those without the disease (true negative rate). Ideally, tests have high sensitivity and specificity.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is a confidence interval in epidemiological research?",
+                    back: "A confidence interval provides a range of values that likely contains the true population parameter. A 95% confidence interval means if the study were repeated many times, 95% of the intervals would contain the true value. Narrower intervals indicate more precise estimates.",
+                    difficulty: 3
+                },
+                {
+                    front: "How do epidemiologists investigate disease outbreaks?",
+                    back: "Outbreak investigation typically involves: verifying the diagnosis, confirming the outbreak, defining cases, describing cases by time/place/person, developing hypotheses, testing hypotheses, implementing control measures, and communicating findings. The process is often iterative.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is the difference between relative risk and odds ratio?",
+                    back: "Relative risk compares the probability of an event between two groups. Odds ratio compares the odds of an event between two groups. In cohort studies, both can be calculated. In case-control studies, only odds ratio can be calculated. When diseases are rare, odds ratio approximates relative risk.",
+                    difficulty: 3
+                },
+                {
+                    front: "What are confounding variables?",
+                    back: "Confounders are variables associated with both the exposure and outcome that can distort the apparent relationship between them. Controlling for confounders through study design or analysis is essential for valid results in epidemiological research.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is surveillance in epidemiology?",
+                    back: "Surveillance is the ongoing systematic collection, analysis, interpretation, and dissemination of health data. It's used to detect changes in health status, identify outbreaks, monitor trends, evaluate interventions, and inform public health policy and planning.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does epidemiology contribute to environmental health?",
+                    back: "Epidemiology helps: identify environmental causes of disease, establish exposure-response relationships, set environmental standards, evaluate interventions, identify vulnerable populations, and quantify the burden of environmentally-related diseases.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the Bradford Hill criteria for causation?",
+                    back: "These criteria help assess whether an association is causal: strength, consistency, specificity, temporality, biological gradient, plausibility, coherence, experiment, and analogy. Not all criteria must be met, and they're guidelines rather than strict rules.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is the difference between endemic, epidemic, and pandemic?",
+                    back: "Endemic: constant presence of disease in a geographic area. Epidemic: increase, often sudden, in cases above expected levels. Pandemic: epidemic that has spread over multiple countries or continents, affecting a large number of people.",
+                    difficulty: 2
+                },
+                {
+                    front: "How are rates used in epidemiology?",
+                    back: "Rates measure the occurrence of events in a population over time. Common rates include: incidence rate, mortality rate, prevalence proportion, and attack rate. Rates allow comparison between populations of different sizes and characteristics.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is bias in epidemiological studies?",
+                    back: "Bias is systematic error that produces incorrect results. Types include: selection bias (flawed selection of participants), information bias (flawed measurement of variables), and confounding (distortion by extraneous variables). Good study design minimizes bias.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is screening in public health?",
+                    back: "Screening tests identify unrecognized disease in apparently healthy populations. Effective screening programs require: important health problem, suitable test, acceptable test, understanding of natural history, treatment options, and cost-effectiveness.",
+                    difficulty: 2
+                },
+                {
+                    front: "How has epidemiology addressed infectious diseases?",
+                    back: "Epidemiology has: identified pathogens and transmission routes, developed vaccination strategies, guided quarantine measures, monitored antimicrobial resistance, investigated outbreaks, and informed pandemic preparedness. It remains crucial for emerging infectious diseases.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are social determinants of health?",
+                    back: "Social determinants are conditions in which people are born, grow, live, work and age that affect health outcomes. They include: socioeconomic status, education, physical environment, employment, social support networks, and access to health care.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does epidemiology address health disparities?",
+                    back: "Epidemiology documents disparities by race, ethnicity, income, and other factors; identifies underlying causes; evaluates interventions to reduce disparities; and monitors progress toward health equity. It highlights where resources and interventions are most needed.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the ethical considerations in epidemiological research?",
+                    back: "Ethical considerations include: informed consent, privacy/confidentiality, minimizing risks, balancing individual and community interests, communicating findings responsibly, and ensuring benefits outweigh risks. Institutional review boards oversee research ethics.",
+                    difficulty: 3
+                },
+                {
+                    front: "How is molecular epidemiology used?",
+                    back: "Molecular epidemiology combines traditional epidemiological methods with laboratory techniques. It can: identify pathogen strains during outbreaks, track transmission pathways, identify genetic susceptibility factors, and understand mechanisms of disease development.",
+                    difficulty: 3
+                }
+            ],
+            "Climate Change": [
+                {
+                    front: "How does climate change affect human health?",
+                    back: "Climate change affects health through: extreme heat events, worsened air quality, altered patterns of infectious diseases, food and water insecurity, mental health impacts, and displacement from extreme weather. Vulnerable populations are disproportionately affected.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the main greenhouse gases contributing to climate change?",
+                    back: "Main greenhouse gases include: carbon dioxide (from fossil fuels, deforestation), methane (from agriculture, waste, fossil fuels), nitrous oxide (from agriculture, industry), and fluorinated gases (industrial processes). These gases trap heat in the atmosphere.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does climate change affect infectious diseases?",
+                    back: "Climate change can: expand ranges of disease vectors (mosquitoes, ticks), alter transmission seasons, affect pathogen survival, and change precipitation patterns affecting waterborne diseases. Diseases like malaria, dengue, and Lyme disease may spread to new areas.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the health impacts of extreme heat events?",
+                    back: "Extreme heat can cause: heat exhaustion, heat stroke, worsened chronic conditions (cardiovascular, respiratory, renal), and increased mortality. Urban heat islands exacerbate these effects. Vulnerable groups include elderly, children, outdoor workers, and those with pre-existing conditions.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does climate change affect food security?",
+                    back: "Climate change affects food security through: reduced crop yields (especially in tropical regions), altered pest and disease patterns, ocean acidification affecting seafood, extreme weather damaging infrastructure, and disruptions to food distribution. This can lead to malnutrition and related health problems.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the connection between climate change and mental health?",
+                    back: "Climate change can cause: anxiety and depression related to environmental changes, post-traumatic stress from extreme weather events, solastalgia (distress from environmental change), and increased stress from resource scarcity. These impacts are emerging public health concerns.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does climate change exacerbate air pollution?",
+                    back: "Climate change can: increase ground-level ozone formation (with higher temperatures), alter patterns of particulate matter, increase pollen production and season length, and increase wildfire smoke. These changes worsen respiratory and cardiovascular diseases.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are adaptation strategies for climate change health impacts?",
+                    back: "Adaptation strategies include: heat early warning systems, climate-resilient health facilities, vector control programs, water management strategies, disaster preparedness, surveillance for climate-sensitive diseases, and public education. These reduce vulnerability to health impacts.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is mitigation in the context of climate change and health?",
+                    back: "Mitigation involves reducing greenhouse gas emissions to limit climate change. Health benefits include: reduced air pollution from burning fewer fossil fuels, increased physical activity from active transportation, healthier diets from sustainable food systems, and improved mental health from greener cities.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does climate change affect water quality and quantity?",
+                    back: "Climate change can: alter precipitation patterns causing droughts or floods, increase water temperature affecting quality, intensify algal blooms, increase runoff of pollutants, and cause saltwater intrusion in coastal aquifers. These changes affect waterborne diseases and access to safe water.",
+                    difficulty: 2
+                },
+                {
+                    front: "What populations are most vulnerable to climate change health impacts?",
+                    back: "Vulnerable populations include: children, elderly, pregnant women, people with chronic illnesses, low-income communities, outdoor workers, indigenous populations, and those in developing countries or coastal areas. Vulnerability is influenced by social and economic factors.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does climate change affect allergens?",
+                    back: "Climate change can: lengthen pollen seasons, increase pollen production, increase pollen allergenicity, and introduce new allergens to areas. These changes worsen allergic respiratory diseases like asthma and allergic rhinitis, affecting quality of life and healthcare costs.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the health co-benefits of climate action?",
+                    back: "Co-benefits include: improved air quality from reduced fossil fuel use, increased physical activity from active transportation, healthier diets from sustainable food systems, reduced noise pollution, improved mental health from green spaces, and reduced health inequalities.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does ocean acidification affect human health?",
+                    back: "Ocean acidification (from absorbed CO2) threatens marine ecosystems that provide food and livelihoods. It can: reduce seafood availability and nutritional quality, harm coral reefs that protect coasts, and potentially affect the ocean's role in regulating climate and producing oxygen.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is the role of the health sector in addressing climate change?",
+                    back: "The health sector can: reduce its own carbon footprint, prepare for climate impacts, advocate for climate policies that benefit health, educate the public about health risks, conduct research on climate-health connections, and build resilience in health systems.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does climate change affect vector-borne diseases?",
+                    back: "Climate change affects vector-borne diseases by: expanding geographic ranges of vectors, lengthening transmission seasons, altering vector behavior and reproduction, affecting pathogen development within vectors, and changing human behavior that affects exposure.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the economic costs of climate change health impacts?",
+                    back: "Costs include: healthcare expenses, lost productivity, disaster response and recovery, infrastructure damage, and national security implications. These costs are substantial and expected to increase, highlighting the economic value of climate action.",
+                    difficulty: 3
+                },
+                {
+                    front: "How does climate change affect mental health in indigenous communities?",
+                    back: "Indigenous communities often have deep connections to land and traditional ways of life. Climate change can cause: loss of traditional foods and medicines, displacement from ancestral lands, loss of cultural practices, and spiritual distress, contributing to mental health challenges.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is climate resilience in public health?",
+                    back: "Climate resilience is the ability to anticipate, prepare for, respond to, and recover from climate-related health threats. It involves: robust health systems, adaptive capacity, social cohesion, sustainable infrastructure, and equitable access to resources.",
+                    difficulty: 2
+                },
+                {
+                    front: "How can individuals reduce their climate impact while improving health?",
+                    back: "Individuals can: use active or public transportation, reduce meat consumption, conserve energy at home, support sustainable policies, prepare for extreme weather, and engage in community resilience efforts. These actions often have immediate health benefits alongside climate benefits.",
+                    difficulty: 2
+                }
+            ],
+            "Waste Management": [
+                {
+                    front: "What are the main types of waste?",
+                    back: "Main types include: municipal solid waste (household trash), hazardous waste (flammable, corrosive, toxic, reactive), biomedical waste (from healthcare), electronic waste (discarded electronics), industrial waste, construction debris, and agricultural waste. Each requires different management approaches.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the waste hierarchy?",
+                    back: "The waste hierarchy prioritizes waste management strategies from most to least preferred: prevention (reduce), reuse, recycling, recovery (energy recovery), and disposal (landfilling, incineration without energy recovery). This framework guides sustainable waste management.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does improper waste disposal affect health?",
+                    back: "Improper disposal can: contaminate water sources, attract disease vectors, cause air pollution from open burning, create physical hazards, and expose waste workers and communities to hazardous materials. These can lead to infections, respiratory problems, and other health issues.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the health risks associated with landfills?",
+                    back: "Landfill risks include: groundwater contamination from leachate, air pollution from landfill gas, odor complaints, disease vectors, and potential exposure to hazardous materials. Modern landfills have liners and gas collection systems to reduce these risks.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does medical waste pose health risks?",
+                    back: "Medical waste may contain: infectious materials, sharps (needles, scalpels), pharmaceutical waste, chemical waste, and radioactive materials. Improper management can cause needle-stick injuries, infections, chemical exposures, and environmental contamination.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the benefits of recycling?",
+                    back: "Recycling benefits include: conservation of resources, energy savings, reduced greenhouse gas emissions, reduced pollution, economic opportunities, reduced landfill space needed, and environmental protection. However, recycling must be done properly to be effective.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is composting and how does it benefit the environment?",
+                    back: "Composting is the controlled decomposition of organic matter. Benefits include: reducing landfill waste, creating nutrient-rich soil amendment, reducing need for chemical fertilizers, improving soil structure, conserving water, and reducing methane emissions from landfills.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does electronic waste (e-waste) affect health?",
+                    back: "E-waste contains hazardous materials like lead, mercury, cadmium, and flame retardants. Informal recycling in developing countries exposes workers to these toxins through open burning and acid baths, causing neurological damage, kidney problems, and other serious health effects.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the principles of hazardous waste management?",
+                    back: "Principles include: waste minimization, proper segregation, safe storage, appropriate labeling, using licensed transporters, treatment to reduce hazard, and disposal in permitted facilities. The 'cradle-to-grave' system tracks hazardous waste from generation to disposal.",
+                    difficulty: 3
+                },
+                {
+                    front: "How does waste management contribute to climate change?",
+                    back: "Waste contributes to climate change through: methane emissions from landfills (powerful greenhouse gas), emissions from waste transportation, energy used in waste processing, and avoided emissions through recycling/composting. Improved waste management can reduce greenhouse gas emissions.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are emerging concerns in waste management?",
+                    back: "Emerging concerns include: plastic pollution (especially microplastics), increasing e-waste, pharmaceutical waste in water systems, waste from renewable energy technologies, and challenges in recycling complex materials. These require new management approaches and policies.",
+                    difficulty: 3
+                },
+                {
+                    front: "How can waste be reduced at the source?",
+                    back: "Source reduction strategies include: product redesign, packaging reduction, consumer education, reusable products, buying in bulk, repairing instead of replacing, and digital alternatives to physical products. Prevention is the most preferred waste management strategy.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the role of policy in waste management?",
+                    back: "Policies can: set recycling targets, ban certain materials, establish extended producer responsibility, create disposal fees, fund recycling infrastructure, support research into new technologies, and set standards for waste treatment and disposal. Effective policy requires stakeholder engagement.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does waste management differ in developing countries?",
+                    back: "In many developing countries: informal waste picking is common, disposal sites are often open dumps, recycling rates may be low, waste collection services may be limited, and health protections for workers may be inadequate. Solutions must be appropriate to local context.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the health risks for waste workers?",
+                    back: "Waste workers face: musculoskeletal injuries, needlestick injuries, exposure to hazardous materials, respiratory problems from dust and fumes, skin conditions, and mental stress. Proper training, protective equipment, and fair working conditions are essential for their health and safety.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does plastic waste affect the environment and health?",
+                    back: "Plastic waste: persists in the environment, entangles wildlife, is ingested by animals, breaks down into microplastics that enter food chains, and can release additives. Health effects of microplastic ingestion are still being studied but are a concern.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is circular economy in relation to waste?",
+                    back: "A circular economy aims to eliminate waste by designing products for durability, reuse, and recycling, keeping materials in use as long as possible. This contrasts with the traditional linear economy (make, use, dispose) and reduces environmental impacts while creating economic opportunities.",
+                    difficulty: 3
+                },
+                {
+                    front: "How can communities improve waste management?",
+                    back: "Communities can: implement effective recycling programs, support composting, organize cleanup events, educate residents, support local recycling markets, advocate for better policies, and develop innovative solutions tailored to local needs. Community engagement is key to success.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the challenges in managing construction waste?",
+                    back: "Challenges include: the bulk and weight of materials, hazardous materials (asbestos, lead), limited recycling markets for some materials, transportation costs, and varying regulations. Construction waste represents a significant portion of total waste in many countries.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does food waste impact the environment?",
+                    back: "Food waste contributes to: methane emissions in landfills, wasted resources used in production (water, energy, land), greenhouse gas emissions from decomposition, and economic losses. Reducing food waste is an important climate strategy with multiple benefits.",
+                    difficulty: 2
+                }
+            ],
+            "Environmental Policy": [
+                {
+                    front: "What is the National Environmental Policy Act (NEPA)?",
+                    back: "NEPA is a foundational U.S. environmental law enacted in 1970. It requires federal agencies to assess the environmental effects of proposed actions and alternatives before making decisions. NEPA established the Council on Environmental Quality and promotes informed decision-making.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the precautionary principle in environmental policy?",
+                    back: "The precautionary principle states that when an activity raises threats of harm to human health or the environment, precautionary measures should be taken even if some cause-and-effect relationships are not fully established scientifically. It shifts the burden of proof to those proposing potentially harmful activities.",
+                    difficulty: 3
+                },
+                {
+                    front: "What are market-based instruments in environmental policy?",
+                    back: "Market-based instruments use economic incentives rather than regulations to achieve environmental goals. Examples include: emissions trading systems, environmental taxes, deposit-refund systems, and subsidies for environmentally friendly practices. They can be cost-effective approaches to pollution control.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is environmental justice?",
+                    back: "Environmental justice is the fair treatment and meaningful involvement of all people regardless of race, color, national origin, or income with respect to environmental laws, regulations, and policies. It addresses the disproportionate environmental burdens borne by marginalized communities.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the role of the Environmental Protection Agency (EPA)?",
+                    back: "The EPA protects human health and the environment by: developing and enforcing regulations, giving grants, studying environmental issues, sponsoring partnerships, teaching about the environment, and publishing information. It implements laws like the Clean Air Act and Clean Water Act.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are international environmental agreements?",
+                    back: "International agreements address transboundary environmental issues. Examples include: the Paris Agreement (climate change), Montreal Protocol (ozone depletion), Convention on Biological Diversity, and Basel Convention (hazardous waste). These require cooperation between nations.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does cost-benefit analysis influence environmental policy?",
+                    back: "Cost-benefit analysis compares the economic costs of regulations with their benefits. It's used to evaluate environmental policies but is controversial because: not all benefits can be easily monetized, distributional impacts may be ignored, and future benefits may be discounted.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is the public trust doctrine?",
+                    back: "The public trust doctrine holds that certain natural resources are preserved for public use, and the government is required to maintain them for the public's reasonable use. It has been applied to navigable waters, shorelands, and increasingly to other environmental resources.",
+                    difficulty: 3
+                },
+                {
+                    front: "How do environmental impact assessments work?",
+                    back: "Environmental impact assessments identify, predict, and evaluate the likely environmental effects of proposed projects. They include: scoping, alternative analysis, impact assessment, mitigation measures, public participation, and monitoring. EIAs inform decision-making but don't necessarily prevent projects.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the difference between regulation and voluntary approaches?",
+                    back: "Regulations are mandatory requirements with enforcement mechanisms. Voluntary approaches rely on willingness to participate and may include: public-private partnerships, certification programs, and voluntary guidelines. Both have roles in environmental protection, with different strengths and limitations.",
+                    difficulty: 2
+                },
+                {
+                    front: "How are environmental standards set?",
+                    back: "Standards are typically based on: scientific risk assessment, technological feasibility, economic considerations, legal requirements, and public input. Process varies by country but generally involves government agencies, expert committees, stakeholder engagement, and sometimes judicial review.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is the role of non-governmental organizations in environmental policy?",
+                    back: "NGOs contribute by: advocating for policies, conducting research, raising public awareness, monitoring compliance, providing expertise, and sometimes implementing programs. They can influence policy at local, national, and international levels.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does federalism affect environmental policy?",
+                    back: "In federal systems, environmental responsibilities are divided between national and subnational governments. This can create: variations in protection levels, innovation laboratories, implementation challenges, and conflicts over jurisdiction. Coordination between levels of government is often necessary.",
+                    difficulty: 3
+                },
+                {
+                    front: "What are common implementation challenges in environmental policy?",
+                    back: "Challenges include: inadequate funding, limited enforcement capacity, political opposition, scientific uncertainty, regulatory complexity, compliance costs, and monitoring difficulties. Effective implementation often requires adaptable approaches and stakeholder buy-in.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does environmental policy address cumulative impacts?",
+                    back: "Cumulative impacts consider the combined effects of multiple stressors over time. Addressing them requires: assessing interactions between stressors, considering historical burdens, evaluating additive/synergistic effects, and developing holistic approaches rather than single-medium regulations.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is the role of science in environmental policy?",
+                    back: "Science provides: understanding of environmental problems, identification of causes, prediction of impacts, development of solutions, and monitoring of outcomes. However, policy decisions also involve values, economics, politics, and law—science informs but doesn't determine policy.",
+                    difficulty: 2
+                },
+                {
+                    front: "How are environmental policies evaluated?",
+                    back: "Evaluation assesses: effectiveness in achieving goals, efficiency (cost-effectiveness), equity impacts, unintended consequences, and implementation challenges. Methods include: monitoring data, economic analysis, case studies, and stakeholder feedback. Evaluation can inform policy improvements.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is adaptive management in environmental policy?",
+                    back: "Adaptive management treats policies as experiments, using monitoring results to adjust approaches over time. It acknowledges uncertainty and complexity, emphasizing learning, flexibility, and iterative decision-making rather than static solutions.",
+                    difficulty: 3
+                },
+                {
+                    front: "How does trade policy affect the environment?",
+                    back: "Trade can: increase pollution through economic activity, spread environmental technologies, create pressure to weaken standards ('race to the bottom'), and lead to disputes over environmental measures. Environmental provisions in trade agreements attempt to address these issues.",
+                    difficulty: 3
+                },
+                {
+                    front: "What are emerging issues in environmental policy?",
+                    back: "Emerging issues include: climate change adaptation, plastic pollution, environmental justice, biodiversity loss, nanotechnology regulation, circular economy policies, and integrating health considerations into environmental decision-making. These require innovative policy approaches.",
+                    difficulty: 3
+                }
+            ],
+            "Risk Assessment": [
+                {
+                    front: "What are the four steps of risk assessment?",
+                    back: "The four steps are: hazard identification (does agent cause adverse effect?), dose-response assessment (what relationship between dose and effect?), exposure assessment (who is exposed and how much?), and risk characterization (what is the overall risk estimate and uncertainty?).",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the difference between risk assessment and risk management?",
+                    back: "Risk assessment is the scientific process of evaluating the nature and magnitude of risk. Risk management is the process of deciding whether and how to address risks, considering assessment results along with economic, social, political, and legal factors.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are uncertainty factors in risk assessment?",
+                    back: "Uncertainty factors are applied to account for: variation among humans, extrapolation from animals to humans, subchronic to chronic exposure, LOAEL to NOAEL extrapolation, and database completeness. They provide a margin of safety when establishing acceptable exposure levels.",
+                    difficulty: 3
+                },
+                {
+                    front: "How is cancer risk assessment different from non-cancer risk assessment?",
+                    back: "Cancer risk assessment typically assumes no threshold (any exposure carries some risk) and uses linear extrapolation. Non-cancer assessment assumes a threshold (safe level exists) and uses uncertainty factors. Some agencies are moving toward unified approaches for certain endpoints.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is the benchmark dose approach?",
+                    back: "The benchmark dose (BMD) is the dose that produces a specified level of response (e.g., 10% increase in adverse effect). The lower confidence limit on the BMD (BMDL) is often used instead of NOAEL/LOAEL because it uses more of the dose-response data and accounts for variability.",
+                    difficulty: 3
+                },
+                {
+                    front: "What are the challenges in exposure assessment?",
+                    back: "Challenges include: estimating past exposures, accounting for all exposure routes, assessing intermittent exposures, addressing sensitive subpopulations, measuring exposures to multiple chemicals, and dealing with limited monitoring data. Exposure models help address some challenges.",
+                    difficulty: 2
+                },
+                {
+                    front: "How does risk assessment address vulnerable populations?",
+                    back: "Risk assessment may: use specific uncertainty factors for children, consider lifestage-specific vulnerabilities, assess exposures for highly exposed subgroups, and evaluate susceptibility factors (genetics, pre-existing conditions). Some assessments specifically address risks to vulnerable groups.",
+                    difficulty: 2
+                },
+                {
+                    front: "What is the role of epidemiology in risk assessment?",
+                    back: "Epidemiology provides: human data avoiding interspecies extrapolation, real-world exposure scenarios, identification of sensitive populations, and evidence of effects at actual exposure levels. Limitations include: confounding, exposure misclassification, and difficulty detecting small effects.",
+                    difficulty: 2
+                },
+                {
+                    front: "How are cumulative risks assessed?",
+                    back: "Cumulative risk assessment evaluates combined risks from multiple stressors (chemical and non-chemical) considering interactions and vulnerabilities. Approaches include: assessing chemical mixtures, considering non-chemical stressors, and addressing community-level vulnerabilities. This is methodologically challenging.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is probabilistic risk assessment?",
+                    back: "Probabilistic assessment uses probability distributions rather than single values to represent variability and uncertainty. It produces a range of risk estimates with associated probabilities, providing more complete information for decision-making than deterministic approaches.",
+                    difficulty: 3
+                },
+                {
+                    front: "How does risk assessment inform regulatory standards?",
+                    back: "Risk assessment provides: scientific basis for standards, identification of hazardous substances, quantification of risk levels, evaluation of risk reduction options, and estimation of margins of exposure. Standards also consider technical feasibility, economic factors, and legal requirements.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are the limitations of animal studies in risk assessment?",
+                    back: "Limitations include: species differences in metabolism and susceptibility, high doses used in studies, controlled conditions not reflecting real-world exposures, and ethical concerns. Despite limitations, animal studies remain important for hazard identification and dose-response assessment.",
+                    difficulty: 2
+                },
+                {
+                    front: "How is genetic information used in risk assessment?",
+                    back: "Genetic information helps: identify susceptible subpopulations, understand mechanisms of toxicity, develop biomarkers of susceptibility, and personalize risk estimates. However, ethical issues around genetic testing and discrimination must be considered.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is the difference between variability and uncertainty?",
+                    back: "Variability refers to true differences in characteristics (e.g., susceptibility in population) that cannot be reduced. Uncertainty refers to lack of knowledge (e.g., about mechanisms) that could be reduced with more research. Both affect risk estimates and should be characterized.",
+                    difficulty: 3
+                },
+                {
+                    front: "How are non-threshold effects assessed?",
+                    back: "Non-threshold effects (e.g., cancer from genotoxic carcinogens) are assessed using low-dose extrapolation models. The linear no-threshold model is often used as a default conservative approach. Some agencies use margin of exposure approaches for certain non-threshold effects.",
+                    difficulty: 3
+                },
+                {
+                    front: "What is the role of mode of action in risk assessment?",
+                    back: "Understanding mode of action (key events leading to adverse effect) helps: determine appropriate extrapolation approaches, identify susceptible life stages, assess human relevance of animal findings, and design better studies. Mode of action analysis can replace default assumptions.",
+                    difficulty: 3
+                },
+                {
+                    front: "How does risk assessment address emerging contaminants?",
+                    back: "For emerging contaminants with limited data, risk assessors may: use read-across from similar chemicals, employ quantitative structure-activity relationships, prioritize testing needs, and use precautionary approaches. As data emerge, assessments are updated.",
+                    difficulty: 3
+                },
+                {
+                    front: "What are the ethical considerations in risk assessment?",
+                    back: "Ethical considerations include: protecting vulnerable populations, addressing environmental justice, transparently communicating uncertainties, balancing individual and community interests, considering future generations, and ensuring equitable distribution of benefits and burdens.",
+                    difficulty: 3
+                },
+                {
+                    front: "How is risk assessment used in site-specific cleanup decisions?",
+                    back: "Site-specific assessments: characterize contamination, identify exposure pathways, estimate risks to current and future receptors, establish cleanup goals, and evaluate remediation options. These assessments guide Superfund and other contaminated site cleanups.",
+                    difficulty: 2
+                },
+                {
+                    front: "What are emerging approaches in risk assessment?",
+                    back: "Emerging approaches include: using new testing methods (high-throughput screening, computational toxicology), incorporating systems biology, assessing mixtures and cumulative risks, addressing nanotechnology, and developing community-based participatory approaches.",
+                    difficulty: 3
+                }
+            ]
+        };
+
+        // App state
+        let currentCard = 0;
+        let isFlipped = false;
+        let selectedCourse = 'Air Quality';
+        let studyMode = 'sequential';
+        let studyStats = {
+            totalCards: Object.values(flashcardsData).reduce((sum, course) => sum + course.length, 0),
+            studiedToday: 0,
+            mastered: 0
+        };
+
+        // Initialize the app
+        function initApp() {
+            createCourseButtons();
+            updateStats();
+            showCard();
+            setupEventListeners();
+        }
+
+        // Create course selection buttons
+        function createCourseButtons() {
+            const container = document.getElementById('course-buttons');
+            container.innerHTML = '';
+            
+            Object.keys(flashcardsData).forEach(course => {
+                const button = document.createElement('button');
+                button.className = `course-button ${selectedCourse === course ? 'active' : ''}`;
+                button.textContent = course;
+                button.addEventListener('click', () => selectCourse(course));
+                container.appendChild(button);
+            });
+        }
+
+        // Select a course
+        function selectCourse(course) {
+            selectedCourse = course;
+            currentCard = 0;
+            isFlipped = false;
+            
+            createCourseButtons();
+            updateStats();
+            showCard();
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById('total-cards').textContent = studyStats.totalCards;
+            document.getElementById('studied-today').textContent = studyStats.studiedToday;
+            document.getElementById('mastered').textContent = studyStats.mastered;
+            
+            const progressPercentage = studyStats.totalCards > 0 
+                ? (studyStats.mastered / studyStats.totalCards) * 100 
+                : 0;
+            
+            document.getElementById('progress-percentage').textContent = `${Math.round(progressPercentage)}%`;
+            document.getElementById('progress-circle').style.strokeDashoffset = 800 - (progressPercentage / 100) * 800;
+        }
+
+        // Show current card
+        function showCard() {
+            const courseCards = flashcardsData[selectedCourse];
+            const card = courseCards[currentCard];
+            
+            document.getElementById('current-course').textContent = selectedCourse;
+            document.getElementById('total-course-cards').textContent = courseCards.length;
+            document.getElementById('current-card').textContent = currentCard + 1;
+            
+            document.getElementById('card-front').textContent = card.front;
+            document.getElementById('card-back').textContent = card.back;
+            
+            const difficultyBadges = document.querySelectorAll('.difficulty-badge');
+            difficultyBadges.forEach(badge => {
+                badge.className = `difficulty-badge difficulty-${card.difficulty}`;
+                badge.textContent = card.difficulty;
+            });
+            
+            document.getElementById('flashcard').className = isFlipped ? 'flashcard flipped' : 'flashcard';
+            document.getElementById('flip-button').textContent = isFlipped ? 'Show Question' : 'Show Answer';
+            
+            document.getElementById('prev-button').disabled = currentCard === 0;
+            document.getElementById('next-button').disabled = currentCard === courseCards.length - 1;
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            document.getElementById('flashcard-container').addEventListener('click', flipCard);
+            document.getElementById('flip-button').addEventListener('click', flipCard);
+            document.getElementById('prev-button').addEventListener('click', prevCard);
+            document.getElementById('next-button').addEventListener('click', nextCard);
+            
+            document.getElementById('sequential-mode').addEventListener('click', () => setStudyMode('sequential'));
+            document.getElementById('random-mode').addEventListener('click', () => setStudyMode('random'));
+        }
+
+        // Flip card
+        function flipCard() {
+            isFlipped = !isFlipped;
+            showCard();
+        }
+
+        // Navigate to previous card
+        function prevCard() {
+            if (currentCard > 0) {
+                currentCard--;
+                isFlipped = false;
+                showCard();
+            }
+        }
+
+        // Navigate to next card
+        function nextCard() {
+            const courseCards = flashcardsData[selectedCourse];
+            if (currentCard < courseCards.length - 1) {
+                currentCard++;
+                isFlipped = false;
+                showCard();
+                
+                // Update stats
+                studyStats.studiedToday++;
+                if (studyStats.studiedToday % 5 === 0) {
+                    studyStats.mastered++;
+                }
+                updateStats();
+            }
+        }
+
+        // Set study mode
+        function setStudyMode(mode) {
+            studyMode = mode;
+            
+            document.getElementById('sequential-mode').className = `mode-option ${mode === 'sequential' ? 'active' : ''}`;
+            document.getElementById('random-mode').className = `mode-option ${mode === 'random' ? 'active' : ''}`;
+            
+            // In a full implementation, this would change how cards are selected
+        }
+
+        // Initialize the app when the page loads
+        window.addEventListener('load', initApp);
+    </script>
+</body>
+</html>
