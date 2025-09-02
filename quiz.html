@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environmental Health Quiz</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f9f0;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            position: relative;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e1e1e1;
+        }
+        
+        h1 {
+            color: #2a7a2a;
+            margin-bottom: 10px;
+        }
+        
+        .timer {
+            background-color: #2a7a2a;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+            border: 1px solid #ddd;
+            border-bottom: none;
+        }
+        
+        .tab.active {
+            background-color: #2a7a2a;
+            color: white;
+        }
+        
+        .welcome-screen, .quiz-screen, .review-screen, .summary-screen {
+            padding: 20px;
+        }
+        
+        .welcome-screen {
+            text-align: center;
+        }
+        
+        .btn {
+            background-color: #2a7a2a;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #1e5e1e;
+        }
+        
+        .question-number {
+            font-weight: bold;
+            color: #2a7a2a;
+            margin-bottom: 10px;
+        }
+        
+        .question {
+            font-size: 18px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .options {
+            margin-bottom: 20px;
+        }
+        
+        .option {
+            display: block;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .option:hover {
+            background-color: #e9f7e9;
+        }
+        
+        .option.selected {
+            background-color: #d4f5d4;
+            border-color: #2a7a2a;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .nav-btn {
+            padding: 10px 20px;
+            background-color: #e1e1e1;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .nav-btn:hover {
+            background-color: #d1d1d1;
+        }
+        
+        .submit-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .submit-btn:hover {
+            background-color: #218838;
+        }
+        
+        .review-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .correct {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .incorrect {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .explanation {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #2a7a2a;
+            font-style: italic;
+        }
+        
+        .summary-screen h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2a7a2a;
+        }
+        
+        .score {
+            font-size: 24px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .topic-summary {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #e1e1e1;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: #2a7a2a;
+            border-radius: 5px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .topic-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .environment-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="environment-icon">🌍</div>
+            <h1>Environmental Health Quiz</h1>
+            <p>Test your knowledge of environmental health and sustainability</p>
+            <div class="timer" id="timer">50:00</div>
+        </header>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="quiz">Quiz</div>
+            <div class="tab" data-tab="review">Review</div>
+            <div class="tab" data-tab="summary">Summary</div>
+        </div>
+        
+        <div id="welcome-screen" class="welcome-screen">
+            <h2>Welcome to the Environmental Health Quiz</h2>
+            <p>This quiz contains questions across various environmental health topics including air quality, water pollution, climate change, and sustainability.</p>
+            <p>You will have 50 minutes to complete the quiz. You can navigate between questions and review your answers before submitting.</p>
+            <button class="btn" id="start-btn">Start Quiz</button>
+        </div>
+        
+        <div id="quiz-screen" class="quiz-screen hidden">
+            <div class="question-number">Question <span id="current-q">1</span> of 20</div>
+            <div class="topic-label">Topic: <span id="question-topic">Air Quality</span></div>
+            <div class="question" id="question-text">Which of the following is a primary air pollutant?</div>
+            
+            <div class="options" id="options-container">
+                <div class="option" data-index="0">Carbon monoxide</div>
+                <div class="option" data-index="1">Ozone</div>
+                <div class="option" data-index="2">Nitric acid</div>
+                <div class="option" data-index="3">Sulfuric acid</div>
+            </div>
+            
+            <div class="navigation">
+                <button class="nav-btn" id="prev-btn">Previous</button>
+                <button class="nav-btn" id="next-btn">Next</button>
+                <button class="nav-btn submit-btn" id="submit-btn">Submit Quiz</button>
+            </div>
+        </div>
+        
+        <div id="review-screen" class="review-screen hidden">
+            <h2>Review Your Answers</h2>
+            <div id="review-questions">
+                <!-- Review questions will be inserted here -->
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn" id="back-to-quiz-btn">Back to Quiz</button>
+            </div>
+        </div>
+        
+        <div id="summary-screen" class="summary-screen hidden">
+            <h2>Quiz Results</h2>
+            <div class="score">Your score: <span id="score-value">0</span>/20</div>
+            
+            <div id="topic-summary">
+                <!-- Topic summary will be inserted here -->
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn" id="restart-btn">Restart Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Quiz data for Environmental Health
+            const quizData = [
+                {
+                    question: "Which of the following is a primary air pollutant?",
+                    options: ["Carbon monoxide", "Ozone", "Nitric acid", "Sulfuric acid"],
+                    correct: 0,
+                    topic: "Air Quality",
+                    explanation: "Carbon monoxide is a primary air pollutant because it is directly emitted from sources like vehicle exhaust and industrial processes. Ozone, nitric acid, and sulfuric acid are secondary pollutants formed through chemical reactions in the atmosphere."
+                },
+                {
+                    question: "What is the primary health concern associated with exposure to asbestos?",
+                    options: ["Skin irritation", "Respiratory diseases including lung cancer", "Neurological disorders", "Cardiovascular diseases"],
+                    correct: 1,
+                    topic: "Toxic Substances",
+                    explanation: "Asbestos exposure primarily causes respiratory diseases, including asbestosis, lung cancer, and mesothelioma. The fibers become lodged in the lungs when inhaled, leading to inflammation, scarring, and potentially cancer over time."
+                },
+                {
+                    question: "Which waterborne disease is caused by a bacterium and characterized by severe diarrhea and dehydration?",
+                    options: ["Malaria", "Cholera", "Hepatitis A", "Typhoid"],
+                    correct: 1,
+                    topic: "Water Quality",
+                    explanation: "Cholera is caused by the bacterium Vibrio cholerae and is characterized by profuse watery diarrhea, vomiting, and dehydration. It spreads through contaminated water and is a major public health concern in areas with poor sanitation."
+                },
+                {
+                    question: "What is the main greenhouse gas responsible for current global warming?",
+                    options: ["Methane", "Nitrous oxide", "Carbon dioxide", "Chlorofluorocarbons"],
+                    correct: 2,
+                    topic: "Climate Change",
+                    explanation: "Carbon dioxide (CO2) is the primary greenhouse gas responsible for global warming, mainly from burning fossil fuels, deforestation, and industrial processes. While other gases have higher warming potential, CO2 contributes most to warming due to its abundance and long atmospheric lifetime."
+                },
+                {
+                    question: "Which of the following is a renewable source of energy?",
+                    options: ["Coal", "Natural gas", "Solar power", "Nuclear power"],
+                    correct: 2,
+                    topic: "Sustainability",
+                    explanation: "Solar power is a renewable energy source that harnesses energy from the sun. Unlike fossil fuels (coal, natural gas) which are finite, solar energy is continuously available. Nuclear power uses finite uranium resources, so it's not considered renewable."
+                },
+                {
+                    question: "What does the term 'carbon footprint' refer to?",
+                    options: ["The amount of carbon dioxide released by a person or organization", "The size of a carbon-based life form", "The measurement of carbon in soil", "The carbon content in fossil fuels"],
+                    correct: 0,
+                    topic: "Climate Change",
+                    explanation: "A carbon footprint is the total amount of greenhouse gases (including carbon dioxide and methane) that are generated by our actions. It's typically measured in equivalent tons of CO2 and includes emissions from transportation, housing, food consumption, and other activities."
+                },
+                {
+                    question: "Which organization sets international standards for drinking water quality?",
+                    options: ["WHO (World Health Organization)", "NASA (National Aeronautics and Space Administration)", "IMF (International Monetary Fund)", "UNESCO (United Nations Educational, Scientific and Cultural Organization)"],
+                    correct: 0,
+                    topic: "Water Quality",
+                    explanation: "The World Health Organization (WHO) publishes Guidelines for Drinking-water Quality that serve as the basis for regulation and standard setting worldwide. These guidelines help countries establish standards that ensure safe drinking water."
+                },
+                {
+                    question: "What is the primary environmental concern associated with plastic pollution?",
+                    options: ["Depletion of oxygen in water", "Its persistence and impact on marine life", "Increase in water temperature", "Altering water pH levels"],
+                    correct: 1,
+                    topic: "Pollution",
+                    explanation: "Plastic pollution persists in the environment for hundreds of years and poses significant threats to marine life through entanglement, ingestion, and habitat disruption. Microplastics can enter the food chain and potentially impact human health."
+                },
+                {
+                    question: "Which of these is a vector-borne disease?",
+                    options: ["Diabetes", "Influenza", "Malaria", "Tuberculosis"],
+                    correct: 2,
+                    topic: "Public Health",
+                    explanation: "Malaria is a vector-borne disease transmitted through the bite of infected Anopheles mosquitoes. Vector-borne diseases are illnesses caused by pathogens and parasites in human populations through vectors like mosquitoes, ticks, and fleas."
+                },
+                {
+                    question: "What is the purpose of the 'Paris Agreement'?",
+                    options: ["To promote international trade", "To combat climate change", "To regulate ocean fishing", "To establish peace treaties"],
+                    correct: 1,
+                    topic: "Policy & Regulation",
+                    explanation: "The Paris Agreement is an international treaty on climate change, adopted in 2015. Its goal is to limit global warming to well below 2°C, preferably to 1.5°C, compared to pre-industrial levels through nationally determined contributions to reduce emissions."
+                },
+                {
+                    question: "Which of these is a sustainable practice?",
+                    options: ["Clear-cutting forests", "Overfishing", "Crop rotation", "Single-use plastics"],
+                    correct: 2,
+                    topic: "Sustainability",
+                    explanation: "Crop rotation is a sustainable agricultural practice that involves growing different types of crops in the same area across different seasons. This helps maintain soil health, reduce erosion, and control pests without excessive chemical inputs."
+                },
+                {
+                    question: "What is the main source of mercury pollution in oceans?",
+                    options: ["Natural ocean processes", "Volcanic activity", "Human activities like coal burning", "Weathering of rocks"],
+                    correct: 2,
+                    topic: "Pollution",
+                    explanation: "Human activities, particularly coal burning and gold mining, are the primary sources of mercury pollution in oceans. Mercury emitted into the atmosphere eventually deposits into water bodies, where it transforms into methylmercury, a toxic form that accumulates in fish and seafood."
+                },
+                {
+                    question: "Which of these is an example of point source pollution?",
+                    options: ["Agricultural runoff", "Urban stormwater", "Factory discharge pipe", "Vehicle emissions"],
+                    correct: 2,
+                    topic: "Pollution",
+                    explanation: "A factory discharge pipe is an example of point source pollution because it comes from a single, identifiable source. In contrast, non-point source pollution like agricultural runoff or urban stormwater comes from diffuse sources."
+                },
+                {
+                    question: "What is the 'greenhouse effect'?",
+                    options: ["The process of plants growing in a greenhouse", "The warming of Earth's surface due to atmospheric gases", "The effect of green paint on temperature", "A method of sustainable farming"],
+                    correct: 1,
+                    topic: "Climate Change",
+                    explanation: "The greenhouse effect is a natural process that warms the Earth's surface. When the Sun's energy reaches the Earth's atmosphere, some is reflected back to space and the rest is absorbed and re-radiated by greenhouse gases, warming the planet."
+                },
+                {
+                    question: "Which of these is a key indicator of water quality?",
+                    options: ["Dissolved oxygen", "Atmospheric pressure", "Wind speed", "Soil pH"],
+                    correct: 0,
+                    topic: "Water Quality",
+                    explanation: "Dissolved oxygen is a crucial indicator of water quality as it supports aquatic life. Low levels may indicate pollution from excess nutrients or organic matter. Other water quality indicators include pH, temperature, turbidity, and presence of contaminants."
+                }
+            ];
+
+            // State variables
+            let currentQuestion = 0;
+            let selectedAnswer = null;
+            let showResult = false;
+            let quizStarted = false;
+            let timeLeft = 3000; // 50 minutes in seconds
+            let userAnswers = {};
+            let reviewMode = false;
+            let activeTab = 'quiz';
+            let timerInterval = null;
+
+            // DOM elements
+            const timerElement = document.getElementById('timer');
+            const welcomeScreen = document.getElementById('welcome-screen');
+            const quizScreen = document.getElementById('quiz-screen');
+            const reviewScreen = document.getElementById('review-screen');
+            const summaryScreen = document.getElementById('summary-screen');
+            const startBtn = document.getElementById('start-btn');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const submitBtn = document.getElementById('submit-btn');
+            const currentQElement = document.getElementById('current-q');
+            const questionTopicElement = document.getElementById('question-topic');
+            const questionTextElement = document.getElementById('question-text');
+            const optionsContainer = document.getElementById('options-container');
+            const reviewQuestionsContainer = document.getElementById('review-questions');
+            const backToQuizBtn = document.getElementById('back-to-quiz-btn');
+            const scoreValueElement = document.getElementById('score-value');
+            const topicSummaryContainer = document.getElementById('topic-summary');
+            const restartBtn = document.getElementById('restart-btn');
+            const tabs = document.querySelectorAll('.tab');
+
+            // Initialize the quiz
+            function initQuiz() {
+                updateTimerDisplay();
+                loadQuestion();
+            }
+
+            // Start the quiz
+            function startQuiz() {
+                quizStarted = true;
+                welcomeScreen.classList.add('hidden');
+                quizScreen.classList.remove('hidden');
+                
+                // Start timer
+                timerInterval = setInterval(function() {
+                    timeLeft--;
+                    updateTimerDisplay();
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        submitQuiz();
+                    }
+                }, 1000);
+            }
+
+            // Update timer display
+            function updateTimerDisplay() {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Change color when time is running low
+                if (timeLeft < 300) { // 5 minutes
+                    timerElement.style.backgroundColor = '#dc3545';
+                }
+            }
+
+            // Load current question
+            function loadQuestion() {
+                const question = quizData[currentQuestion];
+                currentQElement.textContent = currentQuestion + 1;
+                questionTopicElement.textContent = question.topic;
+                questionTextElement.textContent = question.question;
+                
+                // Clear options
+                optionsContainer.innerHTML = '';
+                
+                // Add options
+                question.options.forEach((option, index) => {
+                    const optionElement = document.createElement('div');
+                    optionElement.className = 'option';
+                    optionElement.textContent = option;
+                    optionElement.setAttribute('data-index', index);
+                    
+                    // Mark if this option was previously selected
+                    if (userAnswers[currentQuestion] === index) {
+                        optionElement.classList.add('selected');
+                    }
+                    
+                    optionElement.addEventListener('click', function() {
+                        selectOption(index);
+                    });
+                    
+                    optionsContainer.appendChild(optionElement);
+                });
+                
+                // Update navigation buttons
+                prevBtn.disabled = currentQuestion === 0;
+                nextBtn.disabled = currentQuestion === quizData.length - 1;
+            }
+
+            // Select an option
+            function selectOption(index) {
+                // Remove selected class from all options
+                const options = optionsContainer.querySelectorAll('.option');
+                options.forEach(option => option.classList.remove('selected'));
+                
+                // Add selected class to clicked option
+                options[index].classList.add('selected');
+                
+                // Store the answer
+                userAnswers[currentQuestion] = index;
+                selectedAnswer = index;
+            }
+
+            // Navigate to next question
+            function nextQuestion() {
+                if (currentQuestion < quizData.length - 1) {
+                    currentQuestion++;
+                    loadQuestion();
+                }
+            }
+
+            // Navigate to previous question
+            function prevQuestion() {
+                if (currentQuestion > 0) {
+                    currentQuestion--;
+                    loadQuestion();
+                }
+            }
+
+            // Submit the quiz
+            function submitQuiz() {
+                clearInterval(timerInterval);
+                showResult = true;
+                calculateScore();
+                showSummary();
+            }
+
+            // Calculate score
+            function calculateScore() {
+                let score = 0;
+                for (let i = 0; i < quizData.length; i++) {
+                    if (userAnswers[i] === quizData[i].correct) {
+                        score++;
+                    }
+                }
+                return score;
+            }
+
+            // Show summary screen
+            function showSummary() {
+                const score = calculateScore();
+                scoreValueElement.textContent = score;
+                
+                // Calculate topic-wise scores
+                const topicScores = {};
+                const topicCounts = {};
+                
+                quizData.forEach(question => {
+                    if (!topicScores[question.topic]) {
+                        topicScores[question.topic] = 0;
+                        topicCounts[question.topic] = 0;
+                    }
+                    topicCounts[question.topic]++;
+                });
+                
+                for (let i = 0; i < quizData.length; i++) {
+                    if (userAnswers[i] === quizData[i].correct) {
+                        topicScores[quizData[i].topic]++;
+                    }
+                }
+                
+                // Display topic summary
+                topicSummaryContainer.innerHTML = '';
+                for (const topic in topicScores) {
+                    const percentage = Math.round((topicScores[topic] / topicCounts[topic]) * 100);
+                    
+                    const topicElement = document.createElement('div');
+                    topicElement.className = 'topic-summary';
+                    topicElement.innerHTML = `
+                        <div><strong>${topic}</strong>: ${topicScores[topic]} out of ${topicCounts[topic]} (${percentage}%)</div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: ${percentage}%"></div>
+                        </div>
+                    `;
+                    
+                    topicSummaryContainer.appendChild(topicElement);
+                }
+                
+                // Show summary screen
+                quizScreen.classList.add('hidden');
+                summaryScreen.classList.remove('hidden');
+                setActiveTab('summary');
+            }
+
+            // Show review screen
+            function showReview() {
+                reviewQuestionsContainer.innerHTML = '';
+                
+                quizData.forEach((question, index) => {
+                    const userAnswer = userAnswers[index];
+                    const isCorrect = userAnswer === question.correct;
+                    
+                    const reviewItem = document.createElement('div');
+                    reviewItem.className = 'review-item';
+                    reviewItem.innerHTML = `
+                        <div class="question-number">Question ${index + 1}</div>
+                        <div class="topic-label">Topic: ${question.topic}</div>
+                        <div class="question">${question.question}</div>
+                        <div class="${isCorrect ? 'correct' : 'incorrect'}">
+                            Your answer: ${userAnswer !== undefined ? question.options[userAnswer] : 'Not answered'}
+                            ${isCorrect ? ' (Correct)' : ' (Incorrect)'}
+                        </div>
+                        <div class="correct">Correct answer: ${question.options[question.correct]}</div>
+                        <div class="explanation">${question.explanation}</div>
+                    `;
+                    
+                    reviewQuestionsContainer.appendChild(reviewItem);
+                });
+                
+                quizScreen.classList.add('hidden');
+                reviewScreen.classList.remove('hidden');
+            }
+
+            // Set active tab
+            function setActiveTab(tab) {
+                activeTab = tab;
+                
+                // Update tab UI
+                tabs.forEach(tabElement => {
+                    if (tabElement.getAttribute('data-tab') === tab) {
+                        tabElement.classList.add('active');
+                    } else {
+                        tabElement.classList.remove('active');
+                    }
+                });
+                
+                // Show appropriate screen
+                if (tab === 'quiz') {
+                    reviewScreen.classList.add('hidden');
+                    summaryScreen.classList.add('hidden');
+                    quizScreen.classList.remove('hidden');
+                } else if (tab === 'review') {
+                    quizScreen.classList.add('hidden');
+                    summaryScreen.classList.add('hidden');
+                    reviewScreen.classList.remove('hidden');
+                    showReview();
+                } else if (tab === 'summary') {
+                    quizScreen.classList.add('hidden');
+                    reviewScreen.classList.add('hidden');
+                    summaryScreen.classList.remove('hidden');
+                }
+            }
+
+            // Event listeners
+            startBtn.addEventListener('click', startQuiz);
+            prevBtn.addEventListener('click', prevQuestion);
+            nextBtn.addEventListener('click', nextQuestion);
+            submitBtn.addEventListener('click', submitQuiz);
+            backToQuizBtn.addEventListener('click', function() {
+                setActiveTab('quiz');
+            });
+            restartBtn.addEventListener('click', function() {
+                // Reset state
+                currentQuestion = 0;
+                selectedAnswer = null;
+                showResult = false;
+                quizStarted = false;
+                timeLeft = 3000;
+                userAnswers = {};
+                
+                // Reset UI
+                welcomeScreen.classList.remove('hidden');
+                summaryScreen.classList.add('hidden');
+                setActiveTab('quiz');
+                updateTimerDisplay();
+            });
+            
+            // Tab click event listeners
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    if (quizStarted || this.getAttribute('data-tab') === 'quiz') {
+                        setActiveTab(this.getAttribute('data-tab'));
+                    }
+                });
+            });
+
+            // Initialize the quiz
+            initQuiz();
+        });
+    </script>
+</body>
+</html>
